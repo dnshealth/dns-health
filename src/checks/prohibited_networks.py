@@ -11,6 +11,13 @@
 import dns.resolver
 import ipaddress
 
+def run(domain,ns_list):
+    # Check each ns in ns_list. If one fails, immediately return false. Otherwise, return true after having checked everything
+    for ns in ns_list:
+        if not prohibited_check:
+            return {"description": "Prohibited networks check", "result": False}
+
+    return {"description": "Prohibited networks check", "result": True}
 
 def prohibited_check(ns_server):
     # Excluding special IP - ranges that are not covered in ipaddress module
