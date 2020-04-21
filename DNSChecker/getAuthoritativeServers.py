@@ -1,10 +1,11 @@
+#DNSHEALTH-12
 import queryNameServers
 
-#a function that returns all the authoritative servers for the given url/domain
+#a function that returns all the authoritative servers for the given domain/domain
 #returns a list of tuples with what kind of record we received, the domain of the authority and the domain we queried
-def getAuthoritativeServers(url):
+def getAuthoritativeServers(domain):
     
-    (status,res) = queryNameServers.queryAuthoritativeNameServers(url)
+    (status,res) = queryNameServers.queryAuthoritativeNameServers(domain)
 
     if status =="OK":
    

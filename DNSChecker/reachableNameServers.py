@@ -1,3 +1,4 @@
+#DNSHEALTH-11
 import dns.resolver
 
 MAX_RDCLASS = 65535

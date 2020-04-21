@@ -1,8 +1,9 @@
+#Utility function to help for queries on name servers
 import dns.query
 import dns.resolver
 from dns.exception import DNSException
 
-#a functions that returns all the autghoritative servers for the domain given.
+#a functions that returns all the authoritative servers for the domain given.
 #  Takes a domain as an argument and returns a tuple of the OK to indicate that it succeed 
 # and a list of tuple with all the authoritative domains.
 def queryAuthoritativeNameServers(domain):
