@@ -5,19 +5,18 @@
 #Returns True id all ASN of nameservers are unique
 from ipwhois.net import Net
 from ipwhois.asn import IPASN
-from pprint import pprint
 import socket
 
-def is_network_diverse(hostname, list_of_NS):
-  #Converts input list of nameservers from string to list
-  listNS = list(list_of_NS.strip('[]').split(','))
+def run(hostname, list_of_NS):
+  description = "Network diversity"
   listASN = []
   
   try:
-    for x in listNS:
+    for x in list_of_NS:
+      #Getting IPs of nameservers
       net = Net(socket.gethostbyname(x))
       obj = IPASN(net)
-      #Get dictionary with AS info for specific IP
+      #Getting dictionary with AS info for specific IP
       results = obj.lookup()
       #Extracts only ASN from dictionary and adds them to a list
       listASN.append(results.get('asn'))
