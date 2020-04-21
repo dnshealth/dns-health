@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #Program checks if all nameservers in list refrence each other
-#Takes hostname and list of nameservers as input
+#Takes hostname and list of nameservers as input (input: hostname ['nameserver1','nameserver2','nameserver3',...])
 #Returns False if delegation and zone are not consistent
 #Returns True if delegation and zore are consistent
 import socket
