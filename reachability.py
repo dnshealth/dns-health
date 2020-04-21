@@ -32,8 +32,12 @@ def getNSResults(url):
         
         query.find_rrset(query.additional, dns.name.root, MAX_RDCLASS, dns.rdatatype.OPT, create=True, force_unique=True)
 
+        #make sure it's an str and prints the name of the name server
+        #print type(nameServer.target.to_text())
+        #print nameServer.target.to_text()
+
         #try sending a udp packet to see if it's listening on UDP
-        udpPacket = dns.query.udp(query,nameServer)
+        udpPacket = dns.query.udp(query,nameServer.target.to_text())
 
         #try sending a tcp packet to see if it's listening on TCP
         tcpPacket = dns.query.tcp(None,nameServer)
