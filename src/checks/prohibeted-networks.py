@@ -17,7 +17,7 @@ bad_1 = "203.0.113.0"
 bad_2 = "224.0.0.0"
 
 
-def prohibited_chech(ns_server):
+def prohibited_check(ns_server):
 
     result = dns.resolver.query(ns_server, 'A')
     for ipval in result:
@@ -25,10 +25,12 @@ def prohibited_chech(ns_server):
                 str(ipval) == bad_1 or
                 str(ipval) == bad_2):
             print_fail()
+            return False
 
         else:
             print("[+] The IP for the for " + ns_server + " is: " + ipval.to_text())
             print("[OK]")
+            return True
 
 
 def print_fail():
@@ -36,5 +38,5 @@ def print_fail():
     print("[-] TEST FAIL")
 
 
-# Hard code check
-prohibited_chech("198.51.100.0")
+# For debugging purposes please use prohibited_check("198.51.100.0")
+
