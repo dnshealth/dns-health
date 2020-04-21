@@ -15,3 +15,4 @@ def check_recursive(q, ns_list):
             recursion_exists = True
             print("The name server is set to use recursion when it tried to query", x)
     return recursion_exists
+    # It will return a boolean of whether recursion occured
