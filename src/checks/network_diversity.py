@@ -21,7 +21,7 @@ def run(hostname, list_of_NS):
       #Extracts only ASN from dictionary and adds them to a list
       listASN.append(results.get('asn'))
   except:
-    return False
+    return {"description": "IP address of some nameserver not found", "result": False}
   
   #Checks if all ASN in list are unique
   if len(listASN) > len(set(listASN)):
