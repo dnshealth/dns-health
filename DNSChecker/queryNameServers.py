@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #Utility function to help for queries on name servers
 import dns.query
 import dns.resolver

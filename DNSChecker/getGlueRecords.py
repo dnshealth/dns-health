@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #DNSHEALTH-14
 import queryNameServers
 
