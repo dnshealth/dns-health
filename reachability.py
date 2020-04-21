@@ -2,48 +2,67 @@ import dns.resolver
 
 MAX_RDCLASS = 65535
 
-@staticmethod
+#Helper function to decide wether or not an object(or more specifically a response from a request in our case) is a null pointer or not.
 def isNotNone(obj):
     if obj is not None:
         return True
     else:
         return False
 
+#Helper function to return the IP address of a server
+def getTheIPofAServer(nameOfTheServer):
+    
+    temp  = dns.resolver.Resolver().query(nameOfTheServer.target.to_text(),'A')
 
-def getNSResults(url):
+    for i in temp.response.answer:
+        for j in i.items:
+            return j.to_text()
+
+#get all the reachable name servers form a given domain/url. 
+#returns a tuple with true if all the name servers are sending back a tcp/udp packet 
+# and a dictionary with 3 fields:
+# "nsName" field for the name of the name server
+# "receivedUDPPacket" field for wether or not this nameserver sent a udp packet back
+# "receivedTCPPacket" field for wether or not this nameserver sent a tcp packet back
+
+def getReachableNameServers(domain):
 
     #create an empty list where we can store all the nameservers we found
     nameServers = []
 
-    nameServers = dns.resolver.query(url,dns.rdatatype.NS, raise_on_no_answer=False)
+    nameServers = dns.resolver.query(domain,dns.rdatatype.NS, raise_on_no_answer=False)
 
     #create a dictionary where based on all the nameservers.
-    #1st label refers to the ns name of our url that we inserted.
-    #2nd label shows wether or not we received a UDP response or not.
-    #3rd label shows wether or not we received a TCP response or not.
+    #1st label shows if the nameserver sent back all the packets
+    #2nd label refers to the ns name of the domain that we inserted.
+    #2rd label shows wether or not we received a UDP response or not.
+    #4th label shows wether or not we received a TCP response or not.
     results = {}
 
     for nameServer in nameServers:
 
         #make a dns ns query, acts as a dumb message since whatever we send we just care of what we get back
-        query = dns.message.make_query(url, dns.rdatatype.NS)
+        query = dns.message.make_query(domain, dns.rdatatype.NS)
 
         query.flags |= dns.flags.AD
         
         query.find_rrset(query.additional, dns.name.root, MAX_RDCLASS, dns.rdatatype.OPT, create=True, force_unique=True)
 
-        #make sure it's an str and prints the name of the name server
-        #print type(nameServer.target.to_text())
-        #print nameServer.target.to_text()
+        ipOfnameServer = getTheIPofAServer(nameServer)
 
         #try sending a udp packet to see if it's listening on UDP
-        udpPacket = dns.query.udp(query,nameServer.target.to_text())
+        udpPacket = dns.query.udp(query,ipOfnameServer)
 
         #try sending a tcp packet to see if it's listening on TCP
-        tcpPacket = dns.query.tcp(None,nameServer)
+        tcpPacket = dns.query.tcp(query,ipOfnameServer)
 
-        #add the results in a dictionary and return it, to be checked later by the user.
-        results.update({"nsName" == nameServer, "receivedUDPPacket" == isNotNone(udpPacket),"receivedTCPPacket" == isNotNone(tcpPacket)})
+        if isNotNone(udpPacket) and isNotNone(tcpPacket):
+            results.update({"isGood" : str(True),  "nsName" : nameServer.target.to_text(), "receivedUDPPacket" : isNotNone(udpPacket),"receivedTCPPacket" : isNotNone(tcpPacket)})
+        else:
+            results.update({"isGood" : str(False), "nsName" : nameServer.target.to_text(), "receivedUDPPacket" : isNotNone(udpPacket),"receivedTCPPacket" : isNotNone(tcpPacket)})
 
+    for i in results:
+        if i[0] == "False":
+            return (False, results)
 
-getNSResults("google.com")
+    return (True,results)
