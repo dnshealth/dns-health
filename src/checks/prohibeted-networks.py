@@ -9,21 +9,21 @@
 # ns_server --> should be taken as an argument from the command line
 # ip_val --> extracted value of the ns server
 import dns.resolver
-from IPy import IP
 import ipaddress
-
-# Hard coded special IPs that the imports don't cover
-bad_1 = "203.0.113.0"
-bad_2 = "224.0.0.0"
 
 
 def prohibited_check(ns_server):
-
+    # Excluding special IP - ranges that are not covered in ipaddress module
+    deprecated_ips = ipaddress.ip_network('192.88.99.0/24')
+    shared_address_space = ipaddress.ip_network('100.64.0.0/10')
     result = dns.resolver.query(ns_server, 'A')
     for ipval in result:
         if (ipaddress.ip_address(str(ipval)).is_private or
-                str(ipval) == bad_1 or
-                str(ipval) == bad_2):
+                ipaddress.ip_address(str(ipval)).is_multicast or
+                ipaddress.ip_address(str(ipval)).is_loopback or
+                ipaddress.ip_address(str(ipval)) in deprecated_ips or
+                ipaddress.ip_address(str(ipval)) in shared_address_space
+        ):
             print_fail()
             return False
 
@@ -39,4 +39,3 @@ def print_fail():
 
 
 # For debugging purposes please use prohibited_check("198.51.100.0")
-
