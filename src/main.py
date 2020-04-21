@@ -28,6 +28,9 @@ results = []
 # Run each check and append result to results.
 for check in checks:
     result = check.run(domain,ns)
+    # Check if the check returns a boolean or a more advanced dict consisting of a description too.
+    if isinstance(result, bool):
+        result = {"result": result, "description": str(check.__name__)}
     results.append(result)
 
     # If the check failed, we shall exit the for loop and stop testing.
@@ -36,6 +39,7 @@ for check in checks:
 
 # At the end, we want to output the results in a neat user-readable format.
 for result in results:
+    print(result)
     # If result passed.f
     if result["result"]:
         print("[*] PASS {0}".format(str(result["description"])))
