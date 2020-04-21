@@ -12,19 +12,28 @@ import dns.resolver
 from IPy import IP
 import ipaddress
 
+# Hard coded special IPs that the imports don't cover
+bad_1 = "203.0.113.0"
+bad_2 = "224.0.0.0"
 
 def prohibited_chech(ns_server):
+
     result = dns.resolver.query(ns_server, 'A')
     for ipval in result:
-
-        if ipaddress.ip_address(str(ipval)).is_private:
-            print("[+] Error ! The IP is not a global IP.")
-            print("[+] TEST FAIL")
+        if (ipaddress.ip_address(str(ipval)).is_private or
+                str(ipval) == bad_1 or
+                str(ipval) == bad_2):
+            print_fail()
 
         else:
             print("[+] The IP for the for " + ns_server + " is: " + ipval.to_text())
             print("[OK]")
 
 
+def print_fail():
+    print("[-] Error ! The IP is not a global IP.")
+    print("[-] TEST FAIL")
+
+
 # Hard code check
-prohibited_chech("ns1.loopia.se")
+prohibited_chech("198.51.100.0")
