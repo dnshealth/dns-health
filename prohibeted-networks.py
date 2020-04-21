@@ -16,6 +16,7 @@ import ipaddress
 bad_1 = "203.0.113.0"
 bad_2 = "224.0.0.0"
 
+
 def prohibited_chech(ns_server):
 
     result = dns.resolver.query(ns_server, 'A')
