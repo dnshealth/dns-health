@@ -1,6 +1,9 @@
-import os
-for module in os.listdir(os.path.dirname(__file__)):
-    if module == '__init__.py' or module[-3:] != '.py':
-        continue
-    __import__(module[:-3], locals(), globals())
-del module
+import os, re
+import importlib
+
+__globals = globals()
+
+for file in os.listdir(os.path.dirname(__file__)):
+    mod_name = file[:-3]   # strip .py at the end
+    if not re.match(r'^__', mod_name):
+        __globals[mod_name] = importlib.import_module('.' + mod_name, package=__name__)
