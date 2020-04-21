@@ -25,6 +25,6 @@ def run(hostname, list_of_NS):
   
   #Checks if all ASN in list are unique
   if len(listASN) > len(set(listASN)):
-    return False
+    return {"description": description, "result": False}
   else:
-    return True
+    return {"description": description, "result": True}
