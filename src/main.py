@@ -22,7 +22,7 @@ domain = args.domain
 ns = args.ns
 
 # Now, we can start to run the checks. We define a list to which we append the results from each check.
-checks = [checks.valid_hostname]
+checks = [checks.valid_hostname, checks.sameSourceAddress]
 results = []
 
 # Run each check and append result to results.
@@ -36,7 +36,7 @@ for check in checks:
 
 # At the end, we want to output the results in a neat user-readable format.
 for result in results:
-    # If result passed.
+    # If result passed.f
     if result["result"]:
         print("[*] PASS {0}".format(str(result["description"])))
     else:
