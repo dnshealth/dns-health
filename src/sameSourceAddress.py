@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-
+"""Responses from the authoritative name servers must contain the same source IP address
+   as the destination IP address of the initial query.
+"""
 import sys
 
 # DNS imports
