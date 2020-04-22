@@ -2,7 +2,7 @@
 # Program checks if all nameservers in list refrence each other
 # Takes hostname and list of nameservers as input
 # Returns False if delegation and zone are not consistent
-# Returns True if delegation and zore are consistent
+# Returns True if delegation and zone are consistent
 import socket
 import dns.resolver
 
