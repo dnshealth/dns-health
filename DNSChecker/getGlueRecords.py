@@ -8,34 +8,34 @@ from dns.exception import DNSException
 # returns a tuple w the ok sign and the list with the answers
 def getGlueRecords(domain):
 
-    nameServers         = []
+    name_servers         = []
 
-    name                = dns.name.from_text(domain)
+    name                 = dns.name.from_text(domain)
 
-    defaultResolver     = dns.resolver.get_default_resolver()
+    default_resolver     = dns.resolver.get_default_resolver()
 
-    depth               = 2
+    depth                = 2
 
-    for nameServer in defaultResolver.nameservers:
+    for name_server in default_resolver.nameservers:
     
             last = False
     
             while not last:
                 
-                subString    = name.split(depth)
+                sub_string     = name.split(depth)
     
-                last         = subString[0].to_unicode() == '@'
+                last           = sub_string[0].to_unicode() == '@'
     
-                subString    = subString[1]
+                sub_string     = sub_string[1]
 
-                query        = dns.message.make_query(subString, dns.rdatatype.NS)
+                query          = dns.message.make_query(sub_string, dns.rdatatype.NS)
     
-                response     = dns.query.udp(query, nameServer)
+                response       = dns.query.udp(query, name_server)
     
-                responseCode = response.rcode()
+                response_code  = response.rcode()
 
                 #if sth bad happens, thorw an exception
-                if responseCode != dns.rcode.NOERROR:
+                if response_code != dns.rcode.NOERROR:
                     raise DNSException("AN ERROR OCCURED")
                 
                 if len(response.authority) > 0:
@@ -56,21 +56,21 @@ def getGlueRecords(domain):
 
                             if depth == 3:
 
-                                ipv4 = defaultResolver.query(authority).rrset[0]
+                                ipv4 = default_resolver.query(authority).rrset[0]
 
                                 ipv6 = None
 
                                 #might have an ipv6
                                 try:
-                                    ipv6 = defaultResolver.query(authority, rdtype=dns.rdatatype.AAAA).rrset[0]
-                                except DNSException as e:
+                                    ipv6 = default_resolver.query(authority, rdtype=dns.rdatatype.AAAA).rrset[0]
+                                except DNSException:
                                     pass
                                 
-                                nameServers += ("GLUE4",authority.to_text(),ipv4)
+                                name_servers += ("GLUE4",authority.to_text(),ipv4)
 
-                                nameServers += ("GLUE6",authority.to_text(),ipv6)
+                                name_servers += ("GLUE6",authority.to_text(),ipv6)
                 depth += 1
             if done:
                 break
 
-    return ("OK",nameServers)
+    return ("OK",name_servers)

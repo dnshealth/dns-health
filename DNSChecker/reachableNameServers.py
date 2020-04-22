@@ -30,9 +30,9 @@ def getTheIPofAServer(nameOfTheServer):
 def getReachableNameServers(domain):
 
     #create an empty list where we can store all the nameservers we found
-    nameServers = []
+    name_servers = []
 
-    nameServers = dns.resolver.query(domain,dns.rdatatype.NS, raise_on_no_answer=False)
+    name_servers = dns.resolver.query(domain,dns.rdatatype.NS, raise_on_no_answer=False)
 
     #create a dictionary where based on all the nameservers.
     #1st label shows if the nameserver sent back all the packets
@@ -41,7 +41,7 @@ def getReachableNameServers(domain):
     #4th label shows wether or not we received a TCP response or not.
     results = {}
 
-    for nameServer in nameServers:
+    for nameServer in name_servers:
 
         #make a dns ns query, acts as a dumb message since whatever we send we just care of what we get back
         query = dns.message.make_query(domain, dns.rdatatype.NS)
