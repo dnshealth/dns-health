@@ -1,4 +1,4 @@
 env/
 *.pyc
-**/test*.py
+**/rtest*.py
 */__pycache__
