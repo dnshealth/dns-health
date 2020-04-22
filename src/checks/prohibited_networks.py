@@ -19,6 +19,7 @@ def run(domain,ns_list):
 
     return {"description": "Prohibited networks check", "result": True}
 
+
 def prohibited_check(ns_server):
     # Excluding special IP - ranges that are not covered in ipaddress module
     deprecated_ips = ipaddress.ip_network('192.88.99.0/24')
