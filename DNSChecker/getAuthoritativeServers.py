@@ -64,8 +64,3 @@ def getAuthoritativeServers(domain):
                 else:
                     pass
     return ("OK",results)
-
-(_,res)=getAuthoritativeServers("dnshealth.pw")
-
-for i in res:
-    print i
