@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 #DNSHEALTH-14
-import dns
-import dns.resolver 
-import dns.query
-import dns.name
+import dns, dns.resolver, dns.query, dns.name
 from dns.exception import DNSException
 
 # a function that returns the glue records
@@ -77,10 +74,3 @@ def getGlueRecords(domain):
                 break
 
     return ("OK",nameServers)
-
-
-(_,res) = getGlueRecords("dnshealth.pw")
-
-for i in res:
-    print i
-
