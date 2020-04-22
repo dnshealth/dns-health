@@ -9,7 +9,7 @@ import socket
 
 
 
-def run(hostname, list_of_NS):
+def run(hostname, list_of_NS, verbose=False):
     description = "Network diversity"
     listASN = []
 

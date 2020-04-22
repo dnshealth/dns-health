@@ -7,7 +7,7 @@ import socket
 import dns.resolver
 
 
-def run(hostname, list_of_NS):
+def run(hostname, list_of_NS, verbose=False):
     description = "Consistency between delegation and zone"
     listNSIP = []
     list_of_lists = []

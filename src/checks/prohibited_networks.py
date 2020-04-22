@@ -11,16 +11,16 @@
 import dns.resolver
 import ipaddress
 
-def run(domain,ns_list):
+def run(domain,ns_list, verbose=False):
     # Check each ns in ns_list. If one fails, immediately return false. Otherwise, return true after having checked everything
     for ns in ns_list:
-        if not prohibited_check:
+        if not prohibited_check(ns, verbose):
             return {"description": "Prohibited networks check", "result": False}
 
     return {"description": "Prohibited networks check", "result": True}
 
 
-def prohibited_check(ns_server):
+def prohibited_check(ns_server, verbose):
     # Excluding special IP - ranges that are not covered in ipaddress module
     deprecated_ips = ipaddress.ip_network('192.88.99.0/24')
     shared_address_space = ipaddress.ip_network('100.64.0.0/10')
@@ -32,12 +32,14 @@ def prohibited_check(ns_server):
                 ipaddress.ip_address(str(ipval)) in deprecated_ips or
                 ipaddress.ip_address(str(ipval)) in shared_address_space
         ):
-            print_fail()
+            if verbose:
+                print_fail()
             return False
 
         else:
-            print("[+] The IP for the for " + ns_server + " is: " + ipval.to_text())
-            print("[OK]")
+            if verbose:
+                print("[+] The IP for the for " + ns_server + " is: " + ipval.to_text())
+                print("[OK]")
             return True
 
 

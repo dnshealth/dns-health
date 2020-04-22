@@ -27,7 +27,7 @@ def getTheIPofAServer(nameOfTheServer):
 # "receivedUDPPacket" field for wether or not this nameserver sent a udp packet back
 # "receivedTCPPacket" field for wether or not this nameserver sent a tcp packet back
 
-def run(domain, ns):
+def run(domain, ns, verbose=False):
     (result, _msg) = getReachableNameServers(domain,ns)
     return {"result": result, "description": "Nameserver reachability TCP&UDP"}
 

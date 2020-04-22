@@ -1,8 +1,9 @@
-def run(domain, ns):
-    res = check_recursive(domain, ns)
+def run(domain, ns, verbose=False):
+    res = check_recursive(domain, ns, verbose)
     return {"description": "Check nameservers not recursive", "result": not res}
 
-def check_recursive(q, ns_list):
+
+def check_recursive(q, ns_list, verbose):
     # checks for if RD flag is checked in the response
     # q is for the server outside the jurisdiction of the name servers
     # ns_list is a list of all the name servers to be tested
@@ -17,7 +18,9 @@ def check_recursive(q, ns_list):
         s = str(response)
         if "RA" in s: # When "RA" is in the response message then the ns server tells the client that recursion have happened
             recursion_exists = True
-            print("The name server is set to use recursion when it tried to query", x)
+
+            if verbose:
+                print("The name server is set to use recursion when it tried to query", x)
     return recursion_exists
     # It will return a boolean of whether recursion occured
 
