@@ -22,7 +22,7 @@ domain = args.domain
 ns = args.ns
 
 # Now, we can start to run the checks. We define a list to which we append the results from each check.
-checks = [checks.valid_hostname, checks.network_diversity, checks.consistent_delegation_zone, checks.prohibited_networks, checks.sameSourceAddress]
+checks = [checks.valid_hostname, checks.network_diversity, checks.consistent_delegation_zone, checks.prohibited_networks, checks.same_source_address]
 results = []
 
 # Run each check and append result to results.
