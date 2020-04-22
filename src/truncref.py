@@ -166,7 +166,7 @@ def truncref(domain, ns):
     #Comparing the TLDs of the name servers and the domain
     matches = 0
     for names in domains:
-        if names[-3:] == domain[-3:]:
+        if re.search(r'(\.[^\.]+\.)$', names).group(0) == re.search(r'(\.[^\.]+\.)$', domain).group(0):
             matches += 1
 
 
@@ -182,11 +182,3 @@ def truncref(domain, ns):
         else:
             return {"description": "No A records found", "result":False}
   
-
-    
-   
-
-if __name__ == "__main__":
-    print(truncref('project.dnshealth.eu'))
-
-
