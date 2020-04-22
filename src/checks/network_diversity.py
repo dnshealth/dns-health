@@ -8,7 +8,6 @@ from ipwhois.asn import IPASN
 import socket
 
 
-# TODO make less strict. Enough if one NS is in different AS.
 
 def run(hostname, list_of_NS):
     description = "Network diversity"
@@ -27,7 +26,7 @@ def run(hostname, list_of_NS):
         return {"description": "IP address of some nameserver not found", "result": False}
 
     # Checks if all ASN in list are unique
-    if len(listASN) > len(set(listASN)):
+    if  len(set(listASN)) < 2:
         return {"description": description, "result": False}
     else:
         return {"description": description, "result": True}
