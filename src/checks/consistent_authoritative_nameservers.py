@@ -8,6 +8,8 @@ import socket
 import dns.resolver
 
 def run(hostname, list_of_NS):
+  #Filter out duplicate nameserver entries
+  list_of_NS = set(list_of_NS)
   description = "Consistent authoritative nameservers"
   
   #Check if nameserver NS records are consistent if not return False
