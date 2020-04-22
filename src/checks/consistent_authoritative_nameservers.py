@@ -1,17 +1,22 @@
 #!/usr/bin/env python3
 #Program checks if all authoritative nameserver SOA and NS records are consistent
 #Takes hostname and list of nameservers as input
+#Returns False if query fails or nameserver IP can not be resolved
+#Returns False if NS records or SOA records are not consistent
+#Returns True if NS records and SOA records are consistent; contain the same information
 import socket
 import dns.resolver
 
 def run(hostname, list_of_NS):
   description = "Consistent authoritative nameservers"
   
+  #Check if nameserver NS records are consistent if not return False
   if not consistent(hostname, list_of_NS, 'NS'):
     return {"descritpion": "NS records are not consistent", "result": False}
   else:
     pass
   
+  #Check if nameserver SOA records are consistent if not return False
   if not consistent(hostname, list_of_NS, 'SOA'):
     return {"description": "SOA records are not consistent", "result": False}
   else:
@@ -48,9 +53,8 @@ def consistent(hostname, list_of_NS, qtype):
     #If query is refused return false
     except dns.resolver.NoNameservers:
         return False
-      
-    print({"query type": qtype, "results": list_of_lists})
     
+    #Check if first query is equal to all other queries as they need to be the same
     if not all(list_of_lists[0] == i for i in list_of_lists):
       return False
     else:
