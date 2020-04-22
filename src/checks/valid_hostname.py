@@ -22,4 +22,5 @@ def run(hostname, list_of_NS):
   result = all(allowed.match(x) for x in hostname.split(".")) 
   # Also check that the nameservers have correct format
   result &= all(allowed.match(y) for x in list_of_NS for y in x.split("."))
+  return result
   return {"description": description, "result": result}

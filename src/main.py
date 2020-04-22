@@ -22,12 +22,15 @@ domain = args.domain
 ns = args.ns
 
 # Now, we can start to run the checks. We define a list to which we append the results from each check.
-checks = [checks.valid_hostname]
+checks = [checks.valid_hostname, checks.network_diversity, checks.consistent_delegation_zone, checks.prohibited_networks, checks.same_source_address]
 results = []
 
 # Run each check and append result to results.
 for check in checks:
     result = check.run(domain,ns)
+    # Check if the check returns a boolean or a more advanced dict consisting of a description too.
+    if isinstance(result, bool):
+        result = {"result": result, "description": str(check.__name__)}
     results.append(result)
 
     # If the check failed, we shall exit the for loop and stop testing.
@@ -36,7 +39,7 @@ for check in checks:
 
 # At the end, we want to output the results in a neat user-readable format.
 for result in results:
-    # If result passed.
+    # If result passed.f
     if result["result"]:
         print("[*] PASS {0}".format(str(result["description"])))
     else:
