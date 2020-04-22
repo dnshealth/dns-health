@@ -28,7 +28,7 @@ def run(hostname, list_of_NS):
         domain = dns.name.from_text(hostname)
         if not domain.is_absolute():
             domain = domain.concatenate(dns.name.root)
-        # make a query to
+        # Make a query
         request = dns.message.make_query(domain, dns.rdatatype.ANY)
         request.flags |= dns.flags.AD
         request.find_rrset(request.additional, dns.name.root, ADDITIONAL_RDCLASS,
