@@ -37,7 +37,6 @@ def __parse_records(list_of_records, pattern, group):
         servers.append(record.group(group))
 
     if counter == list_of_records.__len__() and servers.__len__() == 0:     #If there are no matches with the regex then the parsing fails
-        print("\nNo matches!")
         return ("Failed", [])
 
     if  counter == list_of_records.__len__():                               #When all records have been checked, exit loop and return a list of the selected fields
@@ -45,9 +44,26 @@ def __parse_records(list_of_records, pattern, group):
 
 
 
-def truncref(domain, ns):
+
+def run(domain, list_of_servers):
+
+    #Goes through the list of authoritative name servers for the domain and checks each one
+    for server in list_of_servers:
+
+        result = __truncref(domain, server)
+        if not result.get('result'):
+            return {"description": "Check for {0} failed with: {1}".format(server, result.get('description')), "result":False}             #If one of them fails the check stops immediately 
+        
+        else:
+            continue
+    
+    return {"description": "All authoritative name servers passed!", "result":True}                                                         #If loop exits without returning all servers passed
+
+
+def __truncref(domain, authoritative_server):
 
     #Makes sure that both domains with and without a period at the end work
+    authoritative_server = authoritative_server if authoritative_server[-1:] == '.' else authoritative_server + '.'
     domain = domain if domain[-1:] == '.' else domain + '.'
 
 
@@ -116,7 +132,7 @@ def truncref(domain, ns):
     
 
     #Converts string to dns.name.Name object
-    domain_name = dns.name.from_text(domain)
+    domain_name = dns.name.from_text(authoritative_server)
  
    
 
@@ -130,9 +146,6 @@ def truncref(domain, ns):
     )
 
 
-
-
-   
 
     #Queries root servers and fails if they can't be reached
     (message, response_from_root) = __ask_servers(root_servers, request)
@@ -153,26 +166,33 @@ def truncref(domain, ns):
     if message != "OK":
         return {"description": "None of the TLD DNS servers could be reached", "result":False}
 
-
-    
-
     #Extracting the domain names of the authoritative name servers from the TLD server response
     domains = []
     for data in response_from_TLD.authority[0]:
         domains.append(data.to_text())
 
 
-
     #Comparing the TLDs of the name servers and the domain
-    matches = 0
+    TLD_matches = 0
     for names in domains:
         if re.search(r'(\.[^\.]+\.)$', names).group(0) == re.search(r'(\.[^\.]+\.)$', domain).group(0):
-            matches += 1
+            TLD_matches += 1
+
+    #Checks if there is such an authoritative nameserver on the TLD server that has a matching lowest level domain part  
+    sub_matches = 0
+    for names in domains:
+        if re.search(r'(^\S+.)',names).group(0) == re.search(r'(^\S+.)',authoritative_server).group(0):
+            sub_matches += 1
 
 
+    #If there is no nameserver as a subdomain for the given domain, then test fails
+    if sub_matches != 1 and TLD_matches == domains.__len__():                                       #Since each authoritative name server has unique name it can only match with one of servers returned by the TLD servers
+        return{'description': 'No such authoritative name server is registered', 'result': False}
 
+
+    
     #Check if all authoritative name servers are in-bailiwick of the parent zone
-    if matches != domains.__len__():
+    if TLD_matches != domains.__len__():
         return {"description": "All authoritative nameservers are not in-bailiwick of the parent zone", "result":True}
     else:
         (message, name_servers) = __parse_records(response_from_TLD.additional, RR_pattern, IP)                         #If all servers are in-bailiwick then parse the additional section for A records
