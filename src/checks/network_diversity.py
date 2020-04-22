@@ -7,6 +7,7 @@ from ipwhois.net import Net
 from ipwhois.asn import IPASN
 import socket
 
+
 # TODO make less strict. Enough if one NS is in different AS.
 
 def run(hostname, list_of_NS):
