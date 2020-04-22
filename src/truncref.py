@@ -16,40 +16,44 @@ def __ask_servers(list_of_servers, request):
             return ("OK", response)
         except dns.exception.Timeout:                               #If there's a timeout the loop continues and tries the next server
             counter += 1
-            if counter == list_of_servers.__len__():                  #If all servers are unavailable then the test fails
+            if counter == list_of_servers.__len__():                #If all servers are unavailable then the test fails
                 return ("Failed", None)
             else:
                 continue
 
 
-
-def __parse_for_IP(list_of_records, pattern):
+#Checks for a server IP addresses from the given section of a DNS server's response 
+def __parse_records(list_of_records, pattern, group):
  counter = 0
  servers = []
+
+ #Check all records of response section
  for text_response in list_of_records:
     counter += 1
 
-    record = re.search(pattern, text_response.to_text(), re.VERBOSE)
+    record = re.search(pattern, text_response.to_text(), re.VERBOSE)         #Match it with the given regex pattern
+    
+    if record != None:                                                       #If the match succeeds add the selected part of the record to a list
+        servers.append(record.group(group))
 
-    if record != None:
-        servers.append(record.group(5))
+    if counter == list_of_records.__len__() and servers.__len__() == 0:     #If there are no matches with the regex then the parsing fails
+        print("\nNo matches!")
+        return ("Failed", [])
 
-    if counter == list_of_records.__len__() and servers.__len__() == 0:
-        print("\nCan't get IP address of servers")
-        print("\nTest Failed!")
-        return ("Failed", None)
-
-    if  counter == list_of_records.__len__():
+    if  counter == list_of_records.__len__():                               #When all records have been checked, exit loop and return a list of the selected fields
         return ("OK", servers)
 
 
 
-def size_check(domain):
+def truncref(domain, ns):
+
+    #Makes sure that both domains with and without a period at the end work
+    domain = domain if domain[-1:] == '.' else domain + '.'
 
 
-    '''Regex pattern for cheking if the returned record under "Additional" is an A record
+    '''Regex pattern for cheking if the returned record is an A record
         
-        Group 1 is the URL of the record
+        Group 1 is the domain of the record
         Group 2 is the TTL
         Group 3 is the class
         Group 4 is the record type(A in this case)
@@ -60,9 +64,7 @@ def size_check(domain):
 
         Where $TEXTSTRING is a record from the response
     '''
-
-
-    A_addr_pattern = r'''
+    RR_pattern = r'''
     ^               #Check from start of string
     
     (\S+)           #Check if there's a URL    
@@ -77,29 +79,22 @@ def size_check(domain):
 
     \s{1}           #Whitespace
 
-    (A)             #A-type record
+    (A)             #A-type or NS-type record
 
     \s{1}           #Whitespace
 
-    (\d{1,3}        #At least 1 to 3 digits for first field of IP address
-    
-    \D{1}           #A non decimal '.' sepetator        
-
-    \d{1,3}         #1 to 3 digits for the second field
-
-    \D{1}           #Another seperator period
-
-    \d{1,3}         #Third field of IP address
-
-    \D{1}           #Seperator
-
-    \d{1,3})        #Last field of IP
+    (\S+)           #Data field of record (IP address in this case)
     
     $               #The end of string should follow
 
     '''
+    #Definitions of the fields as stated in the regex comment
+    Domain = 1
+    TTL = 2
+    Class = 3
+    Type = 4
+    IP = 5
 
-    number_of_root_servers = 13
 
 
     #IP addresses for the root servers from a to m
@@ -121,14 +116,14 @@ def size_check(domain):
     
 
     #Converts string to dns.name.Name object
-    domain = dns.name.from_text(domain)
+    domain_name = dns.name.from_text(domain)
  
    
 
     #Create a DNS query message asking for the A record of the domain, EDNS is not
     #used since that would result in UDP packets larger than 512 octets.
     request = dns.message.make_query(
-        domain,             #Name of the query
+        domain_name,             #Name of the query
         'A',                #Type of record
         'IN',               #Record class
         False,              #Should EDNS be used?
@@ -137,51 +132,61 @@ def size_check(domain):
 
 
 
-    '''
-    Note for tomorrow (21.04.2020)
-    Makes this a function in case of referrals
-    test with amazon.co.jp if you don't remember
-    '''
+   
+
+    #Queries root servers and fails if they can't be reached
     (message, response_from_root) = __ask_servers(root_servers, request)
     if message != "OK":
-        print("Can't contact root servers")
-        print("Test failed")
-        return False;
+        return {"description": "None of the root DNS servers could be reached", "result":False}
         
 
-    #Checks for a TLD server IP address from the additional section of the root servers response 
-    (message, TLD_servers) = __parse_for_IP(response_from_root.additional, A_addr_pattern)
+
+    #Parses response from root servers to get IP addresses of TLD servers
+    (message, TLD_servers) = __parse_records(response_from_root.additional, RR_pattern, IP)
     if message != "OK":
-        print("No usable IP adresses in response")
-        print("Test failed")
-        return False;
+        return {"description": "No usable IP addresses were returned by the DNS root servers", "result":False}
  
     
+
     #Sends query to one of the TLD servers to get info on the nameservers and their glue records
     (message, response_from_TLD) = __ask_servers(TLD_servers, request)
     if message != "OK":
-        print("Can't contact TLD servers")
-        print("Test failed")
-        return False;
+        return {"description": "None of the TLD DNS servers could be reached", "result":False}
 
 
-    print(response_from_TLD)
+    
 
-    (message, name_servers) = __parse_for_IP(response_from_TLD.additional, A_addr_pattern)
-    if message != "OK":
-        print("No usable IP adresses in response")
-        print("Test failed")
-        return False;
-   
+    #Extracting the domain names of the authoritative name servers from the TLD server response
+    domains = []
+    for data in response_from_TLD.authority[0]:
+        domains.append(data.to_text())
 
-    print("Test Passed!")
-    return True
+
+
+    #Comparing the TLDs of the name servers and the domain
+    matches = 0
+    for names in domains:
+        if names[-3:] == domain[-3:]:
+            matches += 1
+
+
+
+    #Check if all authoritative name servers are in-bailiwick of the parent zone
+    if matches != domains.__len__():
+        return {"description": "All authoritative nameservers are not in-bailiwick of the parent zone", "result":True}
+    else:
+        (message, name_servers) = __parse_records(response_from_TLD.additional, RR_pattern, IP)                         #If all servers are in-bailiwick then parse the additional section for A records
+
+        if name_servers.__len__() >= 1:                                                                                 #Checks that there is at least one A record
+            return {"description": "At least one A record found among glue records", "result":True}
+        else:
+            return {"description": "No A records found", "result":False}
   
 
     
    
 
 if __name__ == "__main__":
-    size_check('amazon.co.jp')
+    print(truncref('project.dnshealth.eu'))
 
 
