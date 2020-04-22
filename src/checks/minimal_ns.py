@@ -1,5 +1,9 @@
 import socket
 
+def run(domain, ns):
+    res = unique_ns_list(ns)
+    return {"description": "Unique Nameservers", "result": res}
+
 def unique_ns_list(l): # Takes in a list
     if test_len(l):    # Tests if the length of the list is greater than 1
         if unique_ip(l): # If that passes it checks for unique ip
