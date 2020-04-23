@@ -19,15 +19,20 @@ def unique_ns_list(l): # Takes in a list
 def test_len(l):
     return len(l)>1
 
-def unique_ip(l): 
-    y = socket.gethostbyname(l[0]) # Will return the ip adress of the host adress
-    l2 = l[1:] # creates a list starting from the second element
-    for x in l2: # "for each" loop for every element in the second list
-        
-        if y == socket.gethostbyname(x):
-            return False # if the comparison ever detects same host ip it will return false
-        elif len(l2)<2:
-            return True # if the second list is ever lesser than 2 then it will return true
+def unique_ip(l):
+    try: 
+        y = socket.gethostbyname(l[0]) # Will return the ip adress of the host adress
+        l2 = l[1:] # creates a list starting from the second element
+        for x in l2: # "for each" loop for every element in the second list
+            try:
+                if y == socket.gethostbyname(x):
+                    return False # if the comparison ever detects same host ip it will return false
+                elif len(l2)<2:
+                    return True # if the second list is ever lesser than 2 then it will return true
+            except Exception:
+                pass
+    except Exception:
+        pass
  
     
     return unique_ip(l2)

@@ -12,12 +12,15 @@ def check_recursive(q, ns_list):
     recursion_exists = False
     for x in ns_list:
         query = dns.message.make_query(q, dns.rdatatype.NS)
-        x = socket.gethostbyname(x) 
-        response = dns.query.udp(query, x)
-        s = str(response)
-        if "RA" in s: # When "RA" is in the response message then the ns server tells the client that recursion have happened
-            recursion_exists = True
-            # print("The name server is set to use recursion when it tried to query", x)
+        try:
+            x = socket.gethostbyname(x) 
+            response = dns.query.udp(query, x)
+            s = str(response)
+            if "RA" in s: # When "RA" is in the response message then the ns server tells the client that recursion have happened
+                recursion_exists = True
+                # print("The name server is set to use recursion when it tried to query", x)
+        except Exception:
+            pass
     return recursion_exists
     # It will return a boolean of whether recursion occured
 
