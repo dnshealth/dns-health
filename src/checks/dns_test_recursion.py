@@ -17,7 +17,7 @@ def check_recursive(q, ns_list):
         s = str(response)
         if "RA" in s: # When "RA" is in the response message then the ns server tells the client that recursion have happened
             recursion_exists = True
-            print("The name server is set to use recursion when it tried to query", x)
+            # print("The name server is set to use recursion when it tried to query", x)
     return recursion_exists
     # It will return a boolean of whether recursion occured
 

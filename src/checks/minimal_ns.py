@@ -7,13 +7,13 @@ def run(domain, ns):
 def unique_ns_list(l): # Takes in a list
     if test_len(l):    # Tests if the length of the list is greater than 1
         if unique_ip(l): # If that passes it checks for unique ip
-            print("The servers are more than 1 and unique")
+            # print("The servers are more than 1 and unique")
             return True
         else:
-            print("Though the servers are more than 1, at least 2 of the servers in the list are not unique")
+            # print("Though the servers are more than 1, at least 2 of the servers in the list are not unique")
             return False
     else:
-        print("There are less than 2 nameservers ")
+        # print("There are less than 2 nameservers ")
         return False
     
 def test_len(l):
