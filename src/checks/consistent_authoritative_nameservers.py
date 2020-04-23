@@ -55,8 +55,8 @@ def consistent(hostname, list_of_NS, qtype):
             list_of_lists.append(sorted(temp))
             
     # If query is refused return false
-    except dns.resolver.NoNameservers:
-        return False
+    except:
+        pass
     
     # Check if first query is equal to all other queries as they need to be the same
     if not all(list_of_lists[0] == i for i in list_of_lists):

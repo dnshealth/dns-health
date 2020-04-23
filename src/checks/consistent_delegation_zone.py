@@ -34,8 +34,8 @@ def run(hostname, list_of_NS, verbose=False):
             list_of_lists.append(sorted(temp))
 
     # If query is refused return false
-    except dns.resolver.NoNameservers:
-        return {"description": "Some nameserver query failed", "result": False}
+    except:
+        pass
 
     # Checking if all nameservers from all queries match the input list of nameservers
     if not all(x == sorted(list_of_NS) for x in list_of_lists):

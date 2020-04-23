@@ -11,16 +11,21 @@ def check_recursive(q, ns_list, verbose):
     import dns.query
     import socket
     recursion_exists = False
-    for x in ns_list:
-        query = dns.message.make_query(q, dns.rdatatype.NS)
-        x = socket.gethostbyname(x) 
-        response = dns.query.udp(query, x)
-        s = str(response)
-        if "RA" in s: # When "RA" is in the response message then the ns server tells the client that recursion have happened
-            recursion_exists = True
+    try:
+        for x in ns_list:
+            query = dns.message.make_query(q, dns.rdatatype.NS)
+            x = socket.gethostbyname(x)
+            response = dns.query.udp(query, x)
+            s = str(response)
+            if "RA" in s: # When "RA" is in the response message then the ns server tells the client that recursion have happened
+                recursion_exists = True
 
-            if verbose:
-                print("The name server is set to use recursion when it tried to query", x)
+                if verbose:
+                    print("The name server is set to use recursion when it tried to query", x)
+    except socket.gaierror:
+        # If we can't reach the server
+        return False
+
     return recursion_exists
     # It will return a boolean of whether recursion occured
 

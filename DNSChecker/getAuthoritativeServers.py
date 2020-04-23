@@ -19,7 +19,7 @@ def getAuthoritativeServers(domain):
 
     #start by splitting our domain in all the possible subdomains
     # eg testing.com.se would be split in .se, then in .com.se and finally in tesitng.com.se
-    for i in xrange(len(array_of_domains), 0, -1):
+    for i in range(len(array_of_domains), 0, -1):
         
         sub_string = '.'.join(array_of_domains[i-1:])
 

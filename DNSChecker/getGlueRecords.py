@@ -50,7 +50,7 @@ def getGlueRecords(domain):
                     for host in rrset:
                     # we already have a list of nameservers for this domain, this is to get their IP addresses
                         if host.rdtype == dns.rdatatype.SOA:
-                            print ('Same server is authoritative for {}'.format(sub))
+                            print ('Same server is authoritative for {}'.format(sub_string))
                         else:
                             authority = host.target
 

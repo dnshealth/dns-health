@@ -24,7 +24,12 @@ def prohibited_check(ns_server, verbose):
     # Excluding special IP - ranges that are not covered in ipaddress module
     deprecated_ips = ipaddress.ip_network('192.88.99.0/24')
     shared_address_space = ipaddress.ip_network('100.64.0.0/10')
-    result = dns.resolver.query(ns_server, 'A')
+
+    try:
+        result = dns.resolver.query(ns_server, 'A')
+    except dns.resolver.NXDOMAIN:
+        return False
+
     for ipval in result:
         if (ipaddress.ip_address(str(ipval)).is_private or
                 ipaddress.ip_address(str(ipval)).is_multicast or
