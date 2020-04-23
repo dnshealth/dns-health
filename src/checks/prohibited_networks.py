@@ -13,9 +13,10 @@ import ipaddress
 
 
 def run(domain, ns_list):
-    # Check each ns in ns_list. If one fails, immediately return false. Otherwise, return true after having checked everything
+    # Check each ns in ns_list. If one fails, immediately return false. Otherwise, return true after having checked
+    # everything
     for ns in ns_list:
-        if not prohibited_check:
+        if not prohibited_check(ns):
             return {"description": "Prohibited networks check", "result": False}
 
     return {"description": "Prohibited networks check", "result": True}
@@ -25,7 +26,10 @@ def prohibited_check(ns_server):
     # Excluding special IP - ranges that are not covered in ipaddress module
     deprecated_ips = ipaddress.ip_network('192.88.99.0/24')
     shared_address_space = ipaddress.ip_network('100.64.0.0/10')
-    result = dns.resolver.query(ns_server, 'A')
+    try:
+        result = dns.resolver.query(ns_server, 'A')
+    except:
+        return False
     for ipval in result:
         print(ipval)
         if (
@@ -41,6 +45,5 @@ def prohibited_check(ns_server):
             return True
 
 
-# For debugging purposes please use prohibited_check("198.51.100.0")
-
-print(prohibited_check("ns1.loopia.se"))
+# For debugging purposes please use print(prohibited_check("192.88.99.1"))
+print(prohibited_check("ns.blabla.com"))
