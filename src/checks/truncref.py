@@ -186,9 +186,10 @@ def __truncref(domain, authoritative_server):
     if TLD_matches != domains.__len__():
         return {"description": "All authoritative nameservers are not in-bailiwick of th parent zone", "result":True}
     else:
-        (message, name_servers) = __parse_records(response_from_TLD.additional, RR_pattern, IP)                         #If all servers are in-bailiwick then parse the additional section for A records
+        (message, glue) = __parse_records(response_from_TLD.additional, RR_pattern, IP)                         #If all servers are in-bailiwick then parse the additional section for A records
 
-        if name_servers.__len__() >= 1:                                                                                 #Checks that there is at least one A record
+        if glue.__len__() >= 1 and domains.__len__() >= 2:                                                      #Checks that there is at least one A record and at least two name servers
             return {"description": "At least one A record found among glue records", "result":True}
-        else:
-            return {"description": "No A records found", "result":False}
+        
+        else:                                                                                                   #Otherwise fail -> there are no glue records
+            return {"description": "No glue records found", "result":False}
