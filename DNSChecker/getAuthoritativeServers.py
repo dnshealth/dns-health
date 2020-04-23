@@ -1,70 +1,42 @@
+# -*- coding: UTF-8 -*-
 #!/usr/bin/env python3
 #DNSHEALTH-12
-import dns.query, dns.resolver
+import dns.resolver
 from dns.exception import DNSException
 
-# a functions that returns all the authoritative servers for the domain given.
-# Takes a domain as an argument and returns a tuple of the OK to indicate that it succeed 
-# and a list of tuple with all the authoritative domains.
-def getAuthoritativeServers(domain, name_servers):
+def getTheIPofAServer(nameOfTheServer):
+    
+    temp  = dns.resolver.Resolver().query(nameOfTheServer,'A')
 
-    default_resolver = dns.resolver.get_default_resolver()
+    for i in temp.response.answer:
+        for j in i.items:
+            return j.to_text()
 
-    array_of_domains = domain.split('.')
 
-    #a list that holds all the results for all the authoritative servers for a domain given
-    results = []
+def getAuthServers(domain, name_servers):
 
-    #start by splitting our domain in all the possible subdomains
-    # eg testing.com.se would be split in .se, then in .com.se and finally in tesitng.com.se
-    for i in range(len(array_of_domains), 0, -1):
+    for server in name_servers:
+
+        response = None
+
+        try:
+
+            var      = dns.message.make_query(domain,dns.rdatatype.SOA)
+
+            response = dns.query.udp(var, getTheIPofAServer(server))
         
-        sub_string = '.'.join(array_of_domains[i-1:])
+        except DNSException:
+            return False
 
-        print('Looking up %s on %s' % (sub_string, name_servers))
-        
-        #make a query to send at the dns servers
-        query = dns.message.make_query(sub_string, dns.rdatatype.NS)
-        
-        #send the query for every name server we have
-        response = dns.query.udp(query, name_servers)
+        answer   = response.answer
 
-        #retrieve the response code from the dns query we executed
-        response_codes = response.rcode()
-        
-        #An error occured(either we can't find the domain or something else happened) will be caught here and will probably exit
-        if response_codes != dns.rcode.NOERROR:
-            raise DNSException("AN ERROR OCCURED")
-        
-        #based onthe type of the reposnse, get a list of the responses of the rrsets
-        if len(response.authority) > 0:
-            rrsets = response.authority
-        elif len(response.additional) >0:
-            rrsets = response.additional
-        else:
-            rrsets = response.answer
+        if len(answer) == 0:
+            return False
 
-        if sub_string == domain :
+    return True
 
-        #we must handle all the rrsets, not just the first one
-        #bases on the rdtype response, we need to find which name servers are authoritative
-        
-            for rrset in rrsets:
-            
-                for rr in rrset:
 
-                    #when the same server is authoritative for the domain, pass
-                    if rr.rdtype == dns.rdatatype.NS:
-                    
-                        name_servers = default_resolver.query(rr.target).rrset[0].to_text()
+def run(domain, list_of_name_servers):
+    answer = getAuthServers(domain,list_of_name_servers)
 
-                        results.append(("AUTHORITATIVE",rr.target.to_text(),domain))
-
-                    elif rr.rdtype == dns.rdatatype.SOA:
-                        
-                        results.append(("SAME AUTHORITATIVE SERVER", sub_string))
-
-                    else:
-                       pass
-
-    return ("OK",results)
+    return {'description':"answer authoritatively", 'result': answer}

@@ -1,76 +1,172 @@
+# -*- coding: UTF-8 -*-
 #!/usr/bin/env python3
 #DNSHEALTH-14
 import dns, dns.resolver, dns.query, dns.name
 from dns.exception import DNSException
 
-# a function that returns the glue records
-# takes the domain name 
-# returns a tuple w the ok sign and the list with the answers
-def getGlueRecords(domain):
+import re
 
-    name_servers         = []
-
-    name                 = dns.name.from_text(domain)
-
-    default_resolver     = dns.resolver.get_default_resolver()
-
-    depth                = 2
-
-    for name_server in default_resolver.nameservers:
+def getTheIPofAServer(nameOfTheServer):
     
-            last = False
+    temp  = dns.resolver.Resolver().query(nameOfTheServer,'A')
+
+    for i in temp.response.answer:
+        for j in i.items:
+            return j.to_text()
+
+
+def __ask_servers(list_of_servers, request):
+    counter = 0
+    for server in list_of_servers:
+        try:
+            response = dns.query.udp(request, server, 0.3)          #Send a request to a DNS server and get the reply
+            return ("OK", response)
+        except dns.exception.Timeout:                               #If there's a timeout the loop continues and tries the next server
+            counter += 1
+            if counter == list_of_servers.__len__():                #If all servers are unavailable then the test fails
+                return ("Failed", None)
+            else:
+                continue
+
+
+#Checks for a server IP addresses from the given section of a DNS server's response 
+def __parse_records(list_of_records, pattern, group):
+ counter = 0
+ servers = []
+
+ #Check all records of response section
+ for text_response in list_of_records:
+    counter += 1
+
+    record = re.search(pattern, text_response.to_text(), re.VERBOSE)         #Match it with the given regex pattern
     
-            while not last:
-                
-                sub_string     = name.split(depth)
+    if record != None:                                                       #If the match succeeds add the selected part of the record to a list
+        servers.append(record.group(group))
+
+    if counter == list_of_records.__len__() and servers.__len__() == 0:     #If there are no matches with the regex then the parsing fails
+        return ("Failed", [])
+
+    if  counter == list_of_records.__len__():                               #When all records have been checked, exit loop and return a list of the selected fields
+        return ("OK", servers)
+
+
+#this function is testing the list of name servers given if their glue records are correct
+#takes a domain(not used) and a list of name servers in string format
+#returns true 
+
+def getGlueRecords(domain, list_of_name_servers):
+
+    #hard coded list of all the root servers
+    root_servers = [
+        "198.41.0.4", 
+        "199.9.14.201",
+        "192.33.4.12",
+        "199.7.91.13",
+        "192.203.230.10",
+        "192.5.5.241",
+        "192.112.36.4",
+        "198.97.190.53",
+        "192.36.148.17", 
+        "192.58.128.30",
+        "193.0.14.129", 
+        "199.7.83.42", 
+        "202.12.27.33", 
+    ]
+
+    RR_pattern = r'''
+    ^               #Check from start of string
     
-                last           = sub_string[0].to_unicode() == '@'
+    (\S+)           #Check if there's a URL    
+    \s{1}           #Whitespace
+    (\d+)           #TTL field
+    \s{1}           #Whitespace
+    (IN|CH|HS)      #DNS record class
+    \s{1}           #Whitespace
+    (A)             #A-type or NS-type record
+    \s{1}           #Whitespace
+    (\S+)           #Data field of record (IP address in this case)
     
-                sub_string     = sub_string[1]
+    $               #The end of string should follow
+    '''
 
-                query          = dns.message.make_query(sub_string, dns.rdatatype.NS)
-    
-                response       = dns.query.udp(query, name_server)
-    
-                response_code  = response.rcode()
+    #ietrate over the list of name servers given so we can test them again the actual ip's and server names
+    for server in list_of_name_servers:
 
-                #if sth bad happens, thorw an exception
-                if response_code != dns.rcode.NOERROR:
-                    raise DNSException("AN ERROR OCCURED")
-                
-                if len(response.authority) > 0:
-                    rrset = response.authority[0]
-                else:
-                    rrset = response.answer[0]
+        sub_string = server.split(".")
 
-                #okay, we achieved to get a response and store it in the rrset
-                if len(rrset) > 0:
-                    done = True
+        query = dns.message.make_query(server, dns.rdatatype.A)
+        
+        (_, response_from_the_servers) = __ask_servers(root_servers,query)
 
-                    for host in rrset:
-                    # we already have a list of nameservers for this domain, this is to get their IP addresses
-                        if host.rdtype == dns.rdatatype.SOA:
-                            print ('Same server is authoritative for {}'.format(sub))
-                        else:
-                            authority = host.target
 
-                            if depth == 3:
+        try:
+            answer = response_from_the_servers.additional
 
-                                ipv4 = default_resolver.query(authority).rrset[0]
+            (_,response) = __parse_records(answer,RR_pattern,5)
+        except:
+            return False
 
-                                ipv6 = None
+        (_, response_from_the_servers)= __ask_servers(response,query)
 
-                                #might have an ipv6
-                                try:
-                                    ipv6 = default_resolver.query(authority, rdtype=dns.rdatatype.AAAA).rrset[0]
-                                except DNSException:
-                                    pass
-                                
-                                name_servers += ("GLUE4",authority.to_text(),ipv4)
+        additional_section = response_from_the_servers.additional
 
-                                name_servers += ("GLUE6",authority.to_text(),ipv6)
-                depth += 1
-            if done:
-                break
+        #i[0] contains both ip's and ip's
 
-    return ("OK",name_servers)
+        results = {}
+
+        #build the dictionary based on the additional section of the response we got the server
+        for entry in additional_section:
+
+            name_of_the_server = entry.name.to_text().strip(".")
+            
+            if name_of_the_server in results :
+                results[name_of_the_server].append(entry[0].to_text())
+            else:
+                results[name_of_the_server] = [entry[0].to_text()]
+
+            if name_of_the_server not in list_of_name_servers:
+                results.pop(name_of_the_server,None)
+
+
+        #get all the ipv4 and ipv6 addresses and compare them against the dictionary we built
+        for i in list_of_name_servers:
+            
+            ipv4_query = dns.message.make_query(i,dns.rdatatype.A)
+
+            ipv6_query = dns.message.make_query(i,dns.rdatatype.AAAA)
+
+            ipv4_reponse_of_the_name_server = dns.query.udp(ipv4_query, getTheIPofAServer(server))
+
+            ipv6_reponse_of_the_name_server = dns.query.udp(ipv6_query, getTheIPofAServer(server))
+
+            ipv4_answer_of_the_name_server = ipv4_reponse_of_the_name_server.answer
+
+            ipv6_answer_of_the_name_server = ipv6_reponse_of_the_name_server.answer
+            
+            #basically, our solution works like that. for every ip we get for every server, we delete them from the dictionary.
+            #if the dictionary has some extra addresses or one of the results and not in the dictionary, return false.
+
+            for ip in ipv4_answer_of_the_name_server: 
+
+                if ip[0].to_text() not in results[i]:
+                    return False
+
+                results[i].remove(ip[0].to_text())
+
+            for ip in ipv6_answer_of_the_name_server: 
+
+                if ip[0].to_text() not in results[i]:
+                    return False
+
+                results[i].remove(ip[0].to_text())
+
+        for _,value in results.items():
+            if len(value) != 0:
+                return False
+
+        return True
+
+def run(domain, list_of_name_servers):
+    answer = getGlueRecords(domain,list_of_name_servers)
+
+    return {'description':"got glue records", 'result': answer}
