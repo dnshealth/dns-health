@@ -31,9 +31,10 @@ def unique_ip(l):
                     return True # if the second list is ever lesser than 2 then it will return true
             except Exception:
                 pass
+        return unique_ip(l2)
     except Exception:
-        pass
+        return False
  
     
-    return unique_ip(l2)
+    
  # uses recursive calls to return the answer
