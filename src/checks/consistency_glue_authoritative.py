@@ -135,9 +135,13 @@ def getGlueRecords(domain, list_of_name_servers):
 
             ipv6_query = dns.message.make_query(i,dns.rdatatype.AAAA)
 
-            ipv4_reponse_of_the_name_server = dns.query.udp(ipv4_query, getTheIPofAServer(server))
+            try:
+                ipv4_reponse_of_the_name_server = dns.query.udp(ipv4_query, getTheIPofAServer(server))
 
-            ipv6_reponse_of_the_name_server = dns.query.udp(ipv6_query, getTheIPofAServer(server))
+                ipv6_reponse_of_the_name_server = dns.query.udp(ipv6_query, getTheIPofAServer(server))
+            except dns.resolver.NXDOMAIN:
+                # If the server can not be resolved, return False, since there are obviously no authoritative data.
+                return False
 
             ipv4_answer_of_the_name_server = ipv4_reponse_of_the_name_server.answer
 
