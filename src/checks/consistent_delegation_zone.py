@@ -19,10 +19,10 @@ def run(hostname, list_of_NS):
         for x in list_of_NS:
             listNSIP.append(socket.gethostbyname(x))
     except socket.gaierror:
-        return {"description": "IP for some nameserver could not be found", "result": False}
+        return {"description": description, "result": False}
 
     try:
-        # For every nameserver IP redefine the resolvers nameserver and query the hostname from that nameserver
+        # For every nameserver IP redefine the resolvers name server and query the hostname from that nameserver
         for name in listNSIP:
             resolver.nameservers = [name]
             temp = []
@@ -35,7 +35,7 @@ def run(hostname, list_of_NS):
 
     # If query is refused return false
     except dns.resolver.NoNameservers:
-        return {"description": "Some nameserver query failed", "result": False}
+        return {"description": description, "result": False}
 
     # Checking if all nameservers from all queries match the input list of nameservers
     if not all(x == sorted(list_of_NS) for x in list_of_lists):
