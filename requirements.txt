@@ -1,3 +1,5 @@
 dnspython
 IPy
 ipwhois
+termcolor
+ipaddress
