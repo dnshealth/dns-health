@@ -11,7 +11,7 @@ def run(hostname, list_of_NS):
 
     # Check if hostname correct length
     if len(hostname) > 255:
-        return False
+        return {"description": description, "result": False}
 
     if hostname[-1] == ".":
         # strip end dot, if present
