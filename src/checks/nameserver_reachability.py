@@ -16,9 +16,7 @@ def getTheIPofAServer(nameOfTheServer):
     
     temp  = dns.resolver.Resolver().query(nameOfTheServer,'A')
 
-    for i in temp.response.answer:
-        for j in i.items:
-            return j.to_text()
+    return temp.response.answer[0][0].to_text()
 
 #get all the reachable name servers form a given domain/url. 
 #returns a tuple with true if all the name servers are sending back a tcp/udp packet 

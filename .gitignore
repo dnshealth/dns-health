@@ -3,3 +3,4 @@ env/
 **/rtest*.py
 */__pycache__
 *.vscode
+*.DS_Store
