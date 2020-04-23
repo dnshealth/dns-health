@@ -59,7 +59,7 @@ def run(domain, list_of_servers):
         else:
             continue
     
-    return {"description": "PASS - Glue records found, EDNS0 support verified", "result":True, "details": details}                                                         #If loop exits without returning all servers passed
+    return {"description": "PASS - Glue records found, EDNS0 support verified", "result":True, "details": details}                 #If loop exits without returning all servers passed
 
 
 def __truncref(domain, authoritative_server):
