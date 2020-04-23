@@ -11,8 +11,9 @@ def check_recursive(q, ns_list):
     import socket
     recursion_exists = False
     for x in ns_list:
-        query = dns.message.make_query(q, dns.rdatatype.NS)
         try:
+            query = dns.message.make_query(q, dns.rdatatype.NS)
+        
             x = socket.gethostbyname(x) 
             response = dns.query.udp(query, x)
             s = str(response)
