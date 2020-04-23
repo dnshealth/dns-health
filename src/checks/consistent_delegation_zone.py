@@ -26,9 +26,13 @@ def run(hostname, list_of_NS):
         for name in listNSIP:
             resolver.nameservers = [name]
             temp = []
-            for data in resolver.query(hostname, 'NS'):
-                # Appending query results to a temporary list and removing end dot
-                temp.append(data.to_text()[:-1])
+            try:
+                for data in resolver.query(hostname, 'NS'):
+                    # Appending query results to a temporary list and removing end dot
+                    temp.append(data.to_text()[:-1])
+            except dns.resolver.NoAnswer:
+                # If we got no answer from an NS, we could just claim it has no NS records. So temp will remain empty.
+                pass
 
             # Combining list of results from each query in to list of lists
             list_of_lists.append(sorted(temp))

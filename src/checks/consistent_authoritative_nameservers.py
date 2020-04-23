@@ -44,12 +44,17 @@ def consistent(hostname, list_of_NS, qtype):
         for name in listNSIP:
             resolver.nameservers = [name]
             temp = []
-            for data in resolver.query(hostname, qtype):
-                # Appending query results to a temporary list and removing end dot
-                if data.to_text()[-1] == '.':
-                    temp.append(data.to_text()[:-1])
-                else:
-                    temp.append(data.to_text())
+            try:
+                for data in resolver.query(hostname, qtype):
+                    # Appending query results to a temporary list and removing end dot
+                    if data.to_text()[-1] == '.':
+                        temp.append(data.to_text()[:-1])
+                    else:
+                        temp.append(data.to_text())
+            except:
+                # In the case of an exception, we can just ignore it and go with an empty temp array.
+                pass
+
 
             # Combining list of results from each query in to list of lists
             list_of_lists.append(sorted(temp))
