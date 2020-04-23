@@ -1,4 +1,4 @@
-from unitest import TestCase
+from unittest import TestCase
 from src.checks.minimal_ns import run
 
 class Test(TestCase):

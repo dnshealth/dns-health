@@ -1,4 +1,4 @@
-from unitest import TestCase
+from unittest import TestCase
 from src.checks.dns_test_recursion import run
 
 class Test(TestCase):
