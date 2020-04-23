@@ -1333,6 +1333,9 @@ pre code {
   }
 
   .col-lg-8 {
+    text-align: center;
+    list-style: inside;
+    
     flex: 0 0 66.6666666667%;
     max-width: 66.6666666667%;
   }
@@ -10210,4 +10213,10 @@ form .row:first-child .floating-label-form-group {
 
 .copyright {
   background-color: #1a252f;
+}
+
+.centerlist {
+  float: left;
+  margin: 0 auto;
+  
 }
