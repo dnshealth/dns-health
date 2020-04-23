@@ -13,6 +13,8 @@ from dns.query import UnexpectedSource
 
 
 def run(hostname, list_of_NS):
+
+    description = "Same source address as destination address"
     # Save parameters to variables
     for ns in list_of_NS:
         dnsResolver = dns.resolver.query(ns)
@@ -40,6 +42,6 @@ def run(hostname, list_of_NS):
         # A DNS query response came from an unexpected address or port.
         except UnexpectedSource as e:
             print(str(e))
-            return {"description": "Same source address failed", "result": False}
+            return {"description": description, "result": False}
 
-        return {"description": response.answer, "result": True}
+        return {"description": description, "result": True}

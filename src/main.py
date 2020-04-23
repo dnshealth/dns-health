@@ -4,6 +4,7 @@
 import argparse
 import checks
 import dns.name
+from termcolor import colored
 
 parser = argparse.ArgumentParser()
 
@@ -34,13 +35,15 @@ for check in checks:
     results.append(result)
 
     # If the check failed, we shall exit the for loop and stop testing.
-    if not result["result"]:
-        break
+#    if not result["result"]:
+#        break
 
 # At the end, we want to output the results in a neat user-readable format.
 for result in results:
     # If result passed.f
     if result["result"]:
-        print("[*] PASS {0}".format(str(result["description"])))
+
+        print(colored("[\u2713] PASS {0}".format(str(result["description"])), 'green'))
     else:
-        print("[*] FAIL {0}".format(str(result["description"])))
+
+        print(colored("[X] FAIL {0}".format(str(result["description"])), 'red'))

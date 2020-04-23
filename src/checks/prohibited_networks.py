@@ -13,13 +13,14 @@ import ipaddress
 
 
 def run(domain, ns_list):
+    description = "Prohibited Networks"
     # Check each ns in ns_list. If one fails, immediately return false. Otherwise, return true after having checked
     # everything
     for ns in ns_list:
         if not prohibited_check(ns):
-            return {"description": "Prohibited networks check", "result": False}
+            return {"description": description, "result": False}
 
-    return {"description": "Prohibited networks check", "result": True}
+    return {"description": description, "result": True}
 
 
 def prohibited_check(ns_server):
