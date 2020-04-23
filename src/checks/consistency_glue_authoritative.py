@@ -151,18 +151,18 @@ def getGlueRecords(domain, list_of_name_servers):
             #if the dictionary has some extra addresses or one of the results and not in the dictionary, return false.
 
             for ip in ipv4_answer_of_the_name_server: 
+                if i in results:
+                    if ip[0].to_text() not in results[i]:
+                        return False
 
-                if ip[0].to_text() not in results[i]:
-                    return False
-
-                results[i].remove(ip[0].to_text())
+                    results[i].remove(ip[0].to_text())
 
             for ip in ipv6_answer_of_the_name_server: 
+                if i in results:
+                    if ip[0].to_text() not in results[i]:
+                        return False
 
-                if ip[0].to_text() not in results[i]:
-                    return False
-
-                results[i].remove(ip[0].to_text())
+                    results[i].remove(ip[0].to_text())
 
         for _,value in results.items():
             if len(value) != 0:
