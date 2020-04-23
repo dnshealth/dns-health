@@ -31,7 +31,6 @@ def prohibited_check(ns_server):
     except:
         return False
     for ipval in result:
-        print(ipval)
         if (
                 ipaddress.ip_address(str(ipval)).is_private or
                 ipaddress.ip_address(str(ipval)).is_multicast or
@@ -46,4 +45,4 @@ def prohibited_check(ns_server):
 
 
 # For debugging purposes please use print(prohibited_check("192.88.99.1"))
-print(prohibited_check("ns.blabla.com"))
+
