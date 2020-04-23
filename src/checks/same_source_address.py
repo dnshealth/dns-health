@@ -17,7 +17,11 @@ def run(hostname, list_of_NS):
     description = "Same source address as destination address"
     # Save parameters to variables
     for ns in list_of_NS:
-        dnsResolver = dns.resolver.query(ns)
+        try:
+            dnsResolver = dns.resolver.query(ns)
+        except:
+            # Any error with resolving will cause other checks to fail. That's why we pass this one.
+            return {"description": description, "result": True}
 
         # Get the name server from the dns
         for ipValue in dnsResolver:
