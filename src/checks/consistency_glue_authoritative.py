@@ -127,7 +127,6 @@ def getGlueRecords(domain, list_of_name_servers):
             if name_of_the_server not in list_of_name_servers:
                 results.pop(name_of_the_server,None)
 
-
         #get all the ipv4 and ipv6 addresses and compare them against the dictionary we built
         for i in list_of_name_servers:
             
@@ -136,9 +135,10 @@ def getGlueRecords(domain, list_of_name_servers):
             ipv6_query = dns.message.make_query(i,dns.rdatatype.AAAA)
 
             try:
-                ipv4_reponse_of_the_name_server = dns.query.udp(ipv4_query, getTheIPofAServer(server))
+                ip = getTheIPofAServer(i)
+                ipv4_reponse_of_the_name_server = dns.query.udp(ipv4_query, getTheIPofAServer(i))
 
-                ipv6_reponse_of_the_name_server = dns.query.udp(ipv6_query, getTheIPofAServer(server))
+                ipv6_reponse_of_the_name_server = dns.query.udp(ipv6_query, getTheIPofAServer(i))
             except dns.resolver.NXDOMAIN:
                 # If the server can not be resolved, return False, since there are obviously no authoritative data.
                 return False
@@ -150,7 +150,7 @@ def getGlueRecords(domain, list_of_name_servers):
             #basically, our solution works like that. for every ip we get for every server, we delete them from the dictionary.
             #if the dictionary has some extra addresses or one of the results and not in the dictionary, return false.
 
-            for ip in ipv4_answer_of_the_name_server: 
+            for ip in ipv4_answer_of_the_name_server:
                 if i in results:
                     if ip[0].to_text() not in results[i]:
                         return False
