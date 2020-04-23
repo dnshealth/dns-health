@@ -41,7 +41,6 @@ def run(hostname, list_of_NS):
 
         # A DNS query response came from an unexpected address or port.
         except UnexpectedSource as e:
-            print(str(e))
             return {"description": description, "result": False}
 
         return {"description": description, "result": True}
