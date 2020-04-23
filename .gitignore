@@ -2,3 +2,4 @@ env/
 *.pyc
 **/rtest*.py
 */__pycache__
+*.vscode
