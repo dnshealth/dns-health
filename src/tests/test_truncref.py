@@ -32,4 +32,9 @@ class Test(TestCase):
             ['ns1.parkingcrew.net',
             'ns2.parkingcrew.net'])
 
-        
+    #Test example.com, which does not have glue records for it's authoritative name servers, but it's servers are not in-bailiwick so they pass
+    def test_run4(self):
+        res = run('example.com',
+        ['ns1.example.com',
+        'ns2.example.com'])
+        assert res["result"]

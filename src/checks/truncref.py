@@ -184,7 +184,7 @@ def __truncref(domain, authoritative_server):
     
     #Check if all authoritative name servers are in-bailiwick of the parent zone
     if TLD_matches != domains.__len__():
-        return {"description": "All authoritative nameservers are not in-bailiwick of th parent zone", "result":True}
+        return {"description": "All authoritative nameservers are not in-bailiwick of the parent zone", "result":True}
     else:
         (message, glue) = __parse_records(response_from_TLD.additional, RR_pattern, IP)                         #If all servers are in-bailiwick then parse the additional section for A records
 
