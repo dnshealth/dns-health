@@ -25,12 +25,14 @@ class Test(TestCase):
             'pdns2.ultradns.net.',
             'ns2.p31.dynect.net.',
             'ns1.p31.dynect.net.'])
+        assert res["result"]
 
     #Testing random domain which has only two name servers. Should pass.
     def test_run3(self): 
         res = run('rabvuyraebvu.fef.com',
             ['ns1.parkingcrew.net',
             'ns2.parkingcrew.net'])
+        assert res["result"]
 
     #Test example.com, which does not have glue records for it's authoritative name servers, but it's servers are not in-bailiwick so they pass
     def test_run4(self):
