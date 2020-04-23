@@ -4,14 +4,16 @@
 import argparse
 import checks
 import dns.name
+import json
 from termcolor import colored
 
 parser = argparse.ArgumentParser()
 
 # We define the parameters that the user should input.
-parser.add_argument('--domain')
+parser.add_argument('--domain', help="The domain to check on NS servers")
 # The user can enter a list of nameservers with the --ns param
-parser.add_argument('--ns', type=str, nargs='+')
+parser.add_argument('--ns', type=str, nargs='+', help="A list of NS servers to check.")
+parser.add_argument('--json', help="Output results from checks as JSON", action='count', default=0)
 
 # We parse the arguments
 args = parser.parse_args()
@@ -39,11 +41,14 @@ for check in checks:
 #        break
 
 # At the end, we want to output the results in a neat user-readable format.
-for result in results:
-    # If result passed.f
-    if result["result"]:
+if not args.json:
+    for result in results:
+        # If result passed.
+        if result["result"]:
 
-        print(colored("[\u2713] PASS {0}".format(str(result["description"])), 'green'))
-    else:
+            print(colored("[\u2713] PASS {0}".format(str(result["description"])), 'green'))
+        else:
 
-        print(colored("[X] FAIL {0}".format(str(result["description"])), 'red'))
+            print(colored("[X] FAIL {0}".format(str(result["description"])), 'red'))
+else:
+    print(json.dumps(results))
