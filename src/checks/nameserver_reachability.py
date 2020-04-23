@@ -53,13 +53,17 @@ def getReachableNameServers(domain, nameServers):
         
         query.find_rrset(query.additional, dns.name.root, MAX_RDCLASS, dns.rdatatype.OPT, create=True, force_unique=True)
 
-        ipOfnameServer = getTheIPofAServer(nameServer)
+        try:
+            ipOfnameServer = getTheIPofAServer(nameServer)
 
-        #try sending a udp packet to see if it's listening on UDP
-        udpPacket = dns.query.udp(query,ipOfnameServer)
+            #try sending a udp packet to see if it's listening on UDP
+            udpPacket = dns.query.udp(query,ipOfnameServer)
 
-        #try sending a tcp packet to see if it's listening on TCP
-        tcpPacket = dns.query.tcp(query,ipOfnameServer)
+            #try sending a tcp packet to see if it's listening on TCP
+            tcpPacket = dns.query.tcp(query,ipOfnameServer)
+        except dns.resolver.NXDOMAIN:
+            # If we could not resolve an NS, return false since it is obviously not reachable.
+            return (False, results)
 
         if isNotNone(udpPacket) and isNotNone(tcpPacket):
             results.update({"isGood" : str(True),  "nsName" : nameServer, "receivedUDPPacket" : isNotNone(udpPacket),"receivedTCPPacket" : isNotNone(tcpPacket)})
