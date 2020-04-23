@@ -10,9 +10,7 @@ def getTheIPofAServer(nameOfTheServer):
     
     temp  = dns.resolver.Resolver().query(nameOfTheServer,'A')
 
-    for i in temp.response.answer:
-        for j in i.items:
-            return j.to_text()
+    return temp.response.answer[0][0].to_text()
 
 
 def __ask_servers(list_of_servers, request):
@@ -170,3 +168,5 @@ def run(domain, list_of_name_servers):
     answer = getGlueRecords(domain,list_of_name_servers)
 
     return {'description':"got glue records", 'result': answer}
+
+print run("google.com",['ns1.google.com','ns2.google.com'])
