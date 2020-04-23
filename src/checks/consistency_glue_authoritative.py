@@ -173,4 +173,4 @@ def getGlueRecords(domain, list_of_name_servers):
 def run(domain, list_of_name_servers):
     answer = getGlueRecords(domain,list_of_name_servers)
 
-    return {'description':"got glue records", 'result': answer}
+    return {'description':"Consistency between glue and authoritative data", 'result': answer}
