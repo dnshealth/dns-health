@@ -54,12 +54,12 @@ def run(domain, list_of_servers):
         result = __truncref(domain, server)
         details.append(result)
         if not result.get('result'):
-            return {"description": "Check for {0} failed with: {1}".format(server, result.get('description')), "result":False, 'details': details}             #If one of them fails the check stops immediately 
+            return {"description": "FAIL - Missing glue records or EDNS0 support", "result":False, 'details': details}             #If one of them fails the check stops immediately 
         
         else:
             continue
     
-    return {"description": "All authoritative name servers passed!", "result":True, "details": details}                                                         #If loop exits without returning all servers passed
+    return {"description": "PASS - Glue records found, EDNS0 support verified", "result":True, "details": details}                                                         #If loop exits without returning all servers passed
 
 
 def __truncref(domain, authoritative_server):
