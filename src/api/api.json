@@ -1,0 +1,69 @@
+{
+  "openapi":"3.0.2",
+  "info": {
+    "title":"DNSHEALTH DNS authoritative name server verification tool",
+    "description": "Tool used for checking if authoritative name servers comply with the necessary IANA guidlines.",
+    "license": {
+       "name": "MIT",
+       "url": "https://opensource.org/licenses/MIT"
+     },
+    "version":"1.0"
+    },
+    
+  "servers": [
+    {
+      "url":"https://dnshealth.eu/something",
+      "variables": {
+        "port":  {
+          "default": "8888"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/test":{
+      "post":{     
+        "summary": "Send a query to the backend to test name servers",
+        "operationId": "testServers",
+        "requestBody": {
+          "description": "Domain and name servers to be tested",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Check"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Invalid hostname",
+            "content": {}
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Check": {
+        "type": "object",
+        "properties": {
+          "domain": {
+            "type": "string",
+            "description": "The domain to be delegated"
+          },
+          "nameservers": {
+            "type": "array",
+            "description": "Name servers as strings",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}
