@@ -6,6 +6,7 @@ import dns.name
 from swagger_server.models.check import Check  # noqa: E501
 from swagger_server.models.inv_par import InvPar  # noqa: E501
 from swagger_server.models.result import Result  # noqa: E501
+from swagger_server.models.result_checks import ResultChecks  # noqa: E501
 from swagger_server import util
 
 
@@ -23,13 +24,13 @@ def test_servers(body):  # noqa: E501
         body = Check.from_dict(connexion.request.get_json())  # noqa: E501
 
     if body.domain == "" or body._nameservers == []:
-        return ("One of the fields is empty!", 400)
+        return ({"errorDesc": "One of the fields is empty!"}, 400)
 
     domain = body.domain
     name_servers = body._nameservers
 
     if not checks.valid_hostname.run(domain, name_servers).get("result"):
-        return("Wrong hostname format", 400)
+        return ({"errorDesc": "Wrong hostname format"}, 400)
 
     # Now, we can start to run the checks. We define a list to which we append the results from each check.
     checks_list = [checks.minimal_ns,
