@@ -6,7 +6,6 @@ import dns.name
 from swagger_server.models.check import Check  # noqa: E501
 from swagger_server.models.inv_par import InvPar  # noqa: E501
 from swagger_server.models.result import Result  # noqa: E501
-from swagger_server.models.result_checks import ResultChecks  # noqa: E501
 from swagger_server import util
 
 
@@ -18,17 +17,21 @@ def test_servers(body):  # noqa: E501
     :param body: Domain and name servers to be tested
     :type body: dict | bytes
 
-    :rtype: Result
+    :rtype:(dictionary, int)
     """
+    #Converts request to object of type Check
     if connexion.request.is_json:
         body = Check.from_dict(connexion.request.get_json())  # noqa: E501
 
-    if body.domain == "" or body._nameservers == []:
-        return ({"errorDesc": "One of the fields is empty!"}, 400)
-
+    #Extract the domain string and name server list from the Check object
     domain = body.domain
     name_servers = body._nameservers
 
+    #If the field are empty. return an error
+    if domain == "" or name_servers == []:
+        return ({"errorDesc": "One of the fields is empty!"}, 400)
+
+    #If the user entered a non valid hostname, stop and don't run the other tests
     if not checks.valid_hostname.run(domain, name_servers).get("result"):
         return ({"errorDesc": "Wrong hostname format"}, 400)
 
@@ -54,13 +57,15 @@ def test_servers(body):  # noqa: E501
             result = {"result": result, "description": str(check.__name__)}
         results.append(result)
 
-
+    #Gives each check result a unique id and parses and combines them into the correct format
     check_id = 0
     list_of_check_results = []
     for outcome in results:
-        list_of_check_results.append({"id":check_id, "result": outcome.get("result"), "key": "keytest"})
+        list_of_check_results.append({"id":check_id, "result": outcome.get("result"), "key": outcome.get("description")})
         check_id += 1
 
+    #Creates the necessary JSON response as a dictionary
     response = {"domain": domain, "ns": name_servers, "checks":list_of_check_results}
 
+    #Return the results of the checks and send the 200 OK code
     return (response, 200)
