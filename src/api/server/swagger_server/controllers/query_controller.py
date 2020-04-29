@@ -35,10 +35,10 @@ def test_servers(body):  # noqa: E501
 
     #If the user entered a non valid hostname, stop and don't run the other tests
     if not checks.valid_hostname.run(domain, name_servers).get("result"):
-        return ({"errorDesc": "Wrong hostname format"}, 400)\
+        return ({"errorDesc": "Wrong hostname format"}, 400)
         
         
-    if token == None:
+    if token == None or token == 0:
         return ({"errorDesc": "No token given!"}, 400)
     
     if not check_token(token):
@@ -80,16 +80,18 @@ def test_servers(body):  # noqa: E501
     #Return the results of the checks and send the 200 OK code
     return (response, 200)
 
-conn_params = {
-    "host": "localhost",
-    "port": 6379,
-    "password": None,
-    "db": 0
-}
+
 
 # Check if token given by client is valid
 def check_token(token):
     
+    conn_params = {
+    "host": "localhost",
+    "port": 6379,
+    "password": None,
+    "db": 0
+    }
+   
     # Create a Redis client instance
     r = redis.Redis(**conn_params)
     
