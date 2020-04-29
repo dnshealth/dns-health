@@ -69,7 +69,11 @@ components:
         token:
           type: string
     Token:
-      type: string
+      type: object
+      properties:
+        token:
+          type: string
+          description: User authentication token
     Result:
       type: object
       properties:
