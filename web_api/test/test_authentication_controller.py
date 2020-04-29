@@ -5,8 +5,8 @@ from __future__ import absolute_import
 from flask import json
 from six import BytesIO
 
-from swagger_server.models.token import Token  # noqa: E501
-from swagger_server.test import BaseTestCase
+from web_api.models.token import Token  # noqa: E501
+from web_api.test import BaseTestCase
 
 
 class TestAuthenticationController(BaseTestCase):

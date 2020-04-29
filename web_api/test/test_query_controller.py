@@ -5,10 +5,10 @@ from __future__ import absolute_import
 from flask import json
 from six import BytesIO
 
-from swagger_server.models.check import Check  # noqa: E501
-from swagger_server.models.inv_par import InvPar  # noqa: E501
-from swagger_server.models.result import Result  # noqa: E501
-from swagger_server.test import BaseTestCase
+from web_api.models.check import Check  # noqa: E501
+from web_api.models.inv_par import InvPar  # noqa: E501
+from web_api.models.result import Result  # noqa: E501
+from web_api.test import BaseTestCase
 
 
 class TestQueryController(BaseTestCase):

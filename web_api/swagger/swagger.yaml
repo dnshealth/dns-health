@@ -36,7 +36,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvPar'
-      x-openapi-router-controller: swagger_server.controllers.query_controller
+      x-openapi-router-controller: web_api.controllers.query_controller
   /auth:
     get:
       tags:
@@ -52,7 +52,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Token'
-      x-openapi-router-controller: swagger_server.controllers.authentication_controller
+      x-openapi-router-controller: web_api.controllers.authentication_controller
 components:
   schemas:
     Check:

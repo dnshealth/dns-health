@@ -6,10 +6,10 @@ import redis
 from datetime import datetime
 import itertools
 
-from swagger_server.models.check import Check  # noqa: E501
-from swagger_server.models.inv_par import InvPar  # noqa: E501
-from swagger_server.models.result import Result  # noqa: E501
-from swagger_server import util
+from web_api.models.check import Check  # noqa: E501
+from web_api.models.inv_par import InvPar  # noqa: E501
+from web_api.models.result import Result  # noqa: E501
+from web_api import util
 
 TIME_LIMIT = 5
 
