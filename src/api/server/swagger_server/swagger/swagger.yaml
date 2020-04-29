@@ -1,0 +1,130 @@
+openapi: 3.0.2
+info:
+  title: DNSHEALTH DNS authoritative name server verification tool
+  description: Tool used for checking if authoritative name servers comply with the
+    necessary IANA guidlines.
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  version: "1.0"
+servers:
+- url: https://api.dnshealth.eu/v1
+paths:
+  /check:
+    post:
+      tags:
+      - query
+      summary: Send a query to the backend to test name servers
+      operationId: test_servers
+      requestBody:
+        description: Domain and name servers to be tested
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Check'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+        "400":
+          description: Invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvPar'
+      x-openapi-router-controller: swagger_server.controllers.query_controller
+  /auth:
+    get:
+      tags:
+      - authentication
+      summary: Send random token to user
+      description: User is given token which is later used for authentication
+      operationId: get_token
+      parameters: []
+      responses:
+        "200":
+          description: Token successfully delivered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+      x-openapi-router-controller: swagger_server.controllers.authentication_controller
+components:
+  schemas:
+    Check:
+      type: object
+      properties:
+        domain:
+          type: string
+          description: The domain to be delegated
+        nameservers:
+          type: array
+          description: Name servers as strings
+          items:
+            type: string
+        token:
+          $ref: '#/components/schemas/Token'
+    Token:
+      type: object
+      properties:
+        token:
+          type: integer
+          format: int64
+      example:
+        token: 0
+    Result:
+      type: object
+      properties:
+        domain:
+          type: string
+          description: The domain to be delegated
+        nameservers:
+          type: array
+          description: Name servers as strings
+          items:
+            type: string
+        checks:
+          type: array
+          description: Results of checks
+          items:
+            $ref: '#/components/schemas/Result_checks'
+      example:
+        nameservers:
+        - nameservers
+        - nameservers
+        checks:
+        - result: true
+          id: 0
+          key: key
+        - result: true
+          id: 0
+          key: key
+        domain: domain
+    InvPar:
+      type: object
+      properties:
+        errorDesc:
+          type: string
+          description: Description of error
+    Result_checks:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID of test
+          format: int64
+        result:
+          type: boolean
+          description: Result of check in boolean form
+        key:
+          type: string
+          description: Detailed results of the check
+      example:
+        result: true
+        id: 0
+        key: key
+
