@@ -3,12 +3,15 @@ import six
 from .. import checks
 import dns.name
 import redis
+from datetime import datetime
+import itertools
 
 from swagger_server.models.check import Check  # noqa: E501
 from swagger_server.models.inv_par import InvPar  # noqa: E501
 from swagger_server.models.result import Result  # noqa: E501
 from swagger_server import util
 
+TIME_LIMIT = 5
 
 def test_servers(body):  # noqa: E501
     """Send a query to the backend to test name servers
@@ -36,13 +39,15 @@ def test_servers(body):  # noqa: E501
     #If the user entered a non valid hostname, stop and don't run the other tests
     if not checks.valid_hostname.run(domain, name_servers).get("result"):
         return ({"errorDesc": "Wrong hostname format"}, 400)
-        
-        
-    if token == None or token == 0:
+             
+    if token == None:
         return ({"errorDesc": "No token given!"}, 400)
     
     if not check_token(token):
         return ({"errorDesc": "Invalid token!"}, 400)
+
+    if not check_time_limit(token):
+        return ({"errorDesc": "Too many queries in {TIME_LIMIT} seconds!"}, 400)
         
             
     # Now, we can start to run the checks. We define a list to which we append the results from each check.
@@ -80,28 +85,45 @@ def test_servers(body):  # noqa: E501
     #Return the results of the checks and send the 200 OK code
     return (response, 200)
 
-
-
-# Check if token given by client is valid
-def check_token(token):
-    
-    conn_params = {
+conn_params = {
     "host": "localhost",
     "port": 6379,
     "password": None,
     "db": 0
-    }
-   
+}
+
+# Check if token given by client is valid
+def check_token(token):
+    
     # Create a Redis client instance
     r = redis.Redis(**conn_params)
     
     # Check if the token is in the token:set
-    if r.sismember("token:set", token):
+
+    for i in r.smembers("token:set"):
+            if i[0] == token:
+               return True
+
+    return False
+
+def check_time_limit(token):
+
+    #init a client instance for redis
+    r = redis.Redis(**conn_params)
+
+    for i in r.smembers("token:set"):
+            if i[0] == token:
+                (token, time) = i
+
+    time_delta = (datetime.now() - time)
     
-        # Remove token from database if it exists
-        r.srem("token:set", token)
-        
-        return True
+    total_seconds = time_delta.total_seconds()
+
+    if int(total_seconds) < int(TIME_LIMIT) :
+        return False
     
     else:
-        return False
+        #lazy update the set
+        r.srem("token:set", (token,time))
+        r.sadd("token:set", (token,datetime.now()))
+        return True
