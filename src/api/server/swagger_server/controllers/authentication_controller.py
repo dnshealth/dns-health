@@ -3,20 +3,28 @@ import six
 import redis
 import uuid
 
-from swagger_server.models.token import Token  # noqa: E501
-from swagger_server import util
+# from swagger_server.models.token import Token  # noqa: E501
+# from swagger_server import util
 
+# Connection paramaters for Redis database
+conn_params = {
+    "host": "localhost",
+    "port": 6379,
+    "password": None,
+    "db": 0
+}
 
+# Generate token save it to Redis database and pass it to the user
 def get_token():  # noqa: E501
-    r = redis.Redis()
-    token = uuid.uuid4().int
-    r.sadd("token:set", token)
-    return ({"token": token}, 200)
-
-def check_token(token):
-    r = redis.Redis()
-    if r.sismember("token:set", token):
-        return True
-    else:
-        return False
     
+    # Create a Redis client instance 
+    r = redis.Redis(**conn_params)
+    
+    # Generate token
+    token = uuid.uuid4().int
+    
+    # Save token to database
+    r.sadd("token:set", token)
+    
+    # Return token in dictionary with response code
+    return ({"token": token}, 200)

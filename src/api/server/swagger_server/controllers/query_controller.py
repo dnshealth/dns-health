@@ -2,6 +2,7 @@ import connexion
 import six
 from .. import checks
 import dns.name
+import redis
 
 from swagger_server.models.check import Check  # noqa: E501
 from swagger_server.models.inv_par import InvPar  # noqa: E501
@@ -26,6 +27,7 @@ def test_servers(body):  # noqa: E501
     #Extract the domain string and name server list from the Check object
     domain = body.domain
     name_servers = body._nameservers
+    token = body.token
 
     #If the field are empty. return an error
     if domain == "" or name_servers == []:
@@ -33,8 +35,16 @@ def test_servers(body):  # noqa: E501
 
     #If the user entered a non valid hostname, stop and don't run the other tests
     if not checks.valid_hostname.run(domain, name_servers).get("result"):
-        return ({"errorDesc": "Wrong hostname format"}, 400)
-
+        return ({"errorDesc": "Wrong hostname format"}, 400)\
+        
+        
+    if token == None:
+        return ({"errorDesc": "No token given!"}, 400)
+    
+    if not check_token(token):
+        return ({"errorDesc": "Invalid token!"}, 400)
+        
+            
     # Now, we can start to run the checks. We define a list to which we append the results from each check.
     checks_list = [checks.minimal_ns,
                    checks.valid_hostname,
@@ -69,3 +79,27 @@ def test_servers(body):  # noqa: E501
 
     #Return the results of the checks and send the 200 OK code
     return (response, 200)
+
+conn_params = {
+    "host": "localhost",
+    "port": 6379,
+    "password": None,
+    "db": 0
+}
+
+# Check if token given by client is valid
+def check_token(token):
+    
+    # Create a Redis client instance
+    r = redis.Redis(**conn_params)
+    
+    # Check if the token is in the token:set
+    if r.sismember("token:set", token):
+    
+        # Remove token from database if it exists
+        r.srem("token:set", token)
+        
+        return True
+    
+    else:
+        return False
