@@ -24,9 +24,9 @@ def test_servers(body):  # noqa: E501
     if connexion.request.is_json:
         body = Check.from_dict(connexion.request.get_json())  # noqa: E501
 
-    #Extract the domain string and name server list from the Check object
+    #Extract the domain string and name server list and token string from the Check object
     domain = body.domain
-    name_servers = body._nameservers
+    name_servers = body.nameservers
     token = body.token
 
     #If the field are empty. return an error
@@ -38,7 +38,7 @@ def test_servers(body):  # noqa: E501
         return ({"errorDesc": "Wrong hostname format"}, 400)
         
         
-    if token == None or token == 0:
+    if token == None or token == "":
         return ({"errorDesc": "No token given!"}, 400)
     
     if not check_token(token):
