@@ -2,6 +2,7 @@ import connexion
 import six
 import redis
 import uuid
+from datetime import datetime
 
 # from swagger_server.models.token import Token  # noqa: E501
 # from swagger_server import util
@@ -24,7 +25,7 @@ def get_token():  # noqa: E501
     token = uuid.uuid4().int
     
     # Save token to database
-    r.sadd("token:set", token)
+    r.sadd("token:set", (token, datetime.now()))
     
     # Return token in dictionary with response code
     return ({"token": token}, 200)
