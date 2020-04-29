@@ -22,10 +22,10 @@ def get_token():  # noqa: E501
     r = redis.Redis(**conn_params)
     
     # Generate token
-    token = uuid.uuid4().int
+    token = str(uuid.uuid4().int)
     
     # Save token to database
-    r.sadd("token:set", (token, datetime.now()))
+    r.hset("token:set", token, datetime.now())
     
     # Return token in dictionary with response code
     return ({"token": token}, 200)
