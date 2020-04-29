@@ -7,7 +7,11 @@ from flask import request
 
 from datetime import datetime
 
-limit = 5
+def check_time_limit(auth_token, session_list, time_limit):
+    
+    if auth_token not in session_list.keys():
+        session_list.set(auth_token) = datetime.now()
+        return (200)
 
 class Config:
 
@@ -19,6 +23,8 @@ class Config:
 
     session = None
 
+    '''
+
     def parse_credentials(self,host_url,port,password):
         return 'redis://:'+ password + '@' + host_url+ ':' + str(port)
 
@@ -28,6 +34,8 @@ class Config:
 
         SESSION_REDIS = self.parse_credentials(host_url,port,password)
 
+    '''
+
     def __init__(self,flask_app,flask_environment,secret_key,host_url,port,password):
         
         SECRET_KEY  = secret_key
@@ -36,12 +44,7 @@ class Config:
 
         FLASK_ENV   = flask_environment
 
-        self.initialise_redis(host_url,port,password)
-
-        self.session.init_app(flask_app)
-
     def getRequest(self,request):
-        ip_of_request = request.remote_addr
 
         previous_time_stamp = self.session.get(ip_of_request).time()
 
