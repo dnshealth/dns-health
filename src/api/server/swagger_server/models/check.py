@@ -15,7 +15,7 @@ class Check(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, domain: str=None, nameservers: List[str]=None, token: Token=None):  # noqa: E501
+    def __init__(self, domain: str=None, nameservers: List[str]=None, token: str=None):  # noqa: E501
         """Check - a model defined in Swagger
 
         :param domain: The domain of this Check.  # noqa: E501
@@ -23,12 +23,12 @@ class Check(Model):
         :param nameservers: The nameservers of this Check.  # noqa: E501
         :type nameservers: List[str]
         :param token: The token of this Check.  # noqa: E501
-        :type token: Token
+        :type token: str
         """
         self.swagger_types = {
             'domain': str,
             'nameservers': List[str],
-            'token': Token
+            'token': str
         }
 
         self.attribute_map = {
@@ -98,22 +98,22 @@ class Check(Model):
         self._nameservers = nameservers
 
     @property
-    def token(self) -> Token:
+    def token(self) -> str:
         """Gets the token of this Check.
 
 
         :return: The token of this Check.
-        :rtype: Token
+        :rtype: str
         """
         return self._token
 
     @token.setter
-    def token(self, token: Token):
+    def token(self, token: str):
         """Sets the token of this Check.
 
 
         :param token: The token of this Check.
-        :type token: Token
+        :type token: str
         """
 
         self._token = token

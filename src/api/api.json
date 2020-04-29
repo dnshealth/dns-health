@@ -99,18 +99,12 @@
             }
           },
           "token": {
-            "$ref": "#/components/schemas/Token"
+            "type": "string"
           }
         }
       },
       "Token": {
-        "type": "object",
-        "properties": {
-          "token": {
-            "type": "integer",
-            "format": "int64"
-          }
-        }
+        "type": "string"
       },
       "Result": {
         "type": "object",

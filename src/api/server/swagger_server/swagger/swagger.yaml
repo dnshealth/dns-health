@@ -67,15 +67,9 @@ components:
           items:
             type: string
         token:
-          $ref: '#/components/schemas/Token'
+          type: string
     Token:
-      type: object
-      properties:
-        token:
-          type: integer
-          format: int64
-      example:
-        token: 0
+      type: string
     Result:
       type: object
       properties:
