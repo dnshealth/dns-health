@@ -101,7 +101,7 @@ def check_token(token):
     r = redis.Redis(**conn_params)
     
     # Check if the token is in the token:set
-    if token in r.hgetall("token:set"):
+    if token in r.hgetall("token_hash"):
         return True
     
     return False
@@ -111,10 +111,12 @@ def check_time_limit(token):
     #init a client instance for redis
     r = redis.Redis(**conn_params)
 
-    if token in r.hgetall("token:set"):
-        time = r.hget("token:set", token)
+    if token in r.hgetall("token_hash"):
+        time = r.hget("token_hash", token)
 
-    time_delta = (datetime.now() - time)
+    actualTime = datetime.strptime(time,"%d-%b-%Y (%H:%M:%S.%f)")
+
+    time_delta = (datetime.now() - actualTime)
     
     total_seconds = time_delta.total_seconds()
 
@@ -123,8 +125,8 @@ def check_time_limit(token):
     
     else:
         #lazy update the set
-        r.hdel("token:set", token)
+        r.hdel("token_hash", token)
         
-        r.hset("token:set", token, datetime.now())
+        r.hset("token_hash", token, datetime.now().strftime("%d-%b-%Y (%H:%M:%S.%f)"))
         
         return True

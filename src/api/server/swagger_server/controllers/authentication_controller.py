@@ -25,7 +25,7 @@ def get_token():  # noqa: E501
     token = str(uuid.uuid4().int)
     
     # Save token to database
-    r.hset("token:set", token, datetime.now())
+    r.hset("token_hash", token, datetime.now().strftime("%d-%b-%Y (%H:%M:%S.%f)"))
     
     # Return token in dictionary with response code
     return ({"token": token}, 200)
