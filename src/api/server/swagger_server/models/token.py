@@ -14,14 +14,14 @@ class Token(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, token: int=None):  # noqa: E501
+    def __init__(self, token: str=None):  # noqa: E501
         """Token - a model defined in Swagger
 
         :param token: The token of this Token.  # noqa: E501
-        :type token: int
+        :type token: str
         """
         self.swagger_types = {
-            'token': int
+            'token': str
         }
 
         self.attribute_map = {
@@ -41,22 +41,22 @@ class Token(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def token(self) -> int:
+    def token(self) -> str:
         """Gets the token of this Token.
 
 
         :return: The token of this Token.
-        :rtype: int
+        :rtype: str
         """
         return self._token
 
     @token.setter
-    def token(self, token: int):
+    def token(self, token: str):
         """Sets the token of this Token.
 
 
         :param token: The token of this Token.
-        :type token: int
+        :type token: str
         """
 
         self._token = token
