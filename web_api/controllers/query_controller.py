@@ -113,7 +113,7 @@ def check_time_limit(token):
 
     time = r.hget("token_hash", token)
 
-    actualTime = datetime.strptime(time,"%d-%b-%Y (%H:%M:%S.%f)")
+    actualTime = datetime.strptime(time.decode("utf-8"), "%d-%b-%Y (%H:%M:%S.%f)")
 
     time_delta = (datetime.now() - actualTime)
     
