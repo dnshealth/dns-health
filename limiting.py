@@ -51,5 +51,5 @@ class Config:
             return (-1, "time diff is less than 15 seconds")
         else:
             self.session[ip_of_request] = datetime.now()
-            return 
+            return (0, "valid request")
 
