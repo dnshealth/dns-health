@@ -6,7 +6,7 @@ import sys
 path = os.path.dirname(os.getcwd())
 sys.path.insert(0, path)
 
-import src.checks
+import src.checks as checks
 import dns.name
 import redis
 from datetime import datetime
