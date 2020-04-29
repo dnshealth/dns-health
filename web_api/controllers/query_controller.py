@@ -49,7 +49,7 @@ def test_servers(body):  # noqa: E501
         return ({"errorDesc": "Invalid token!"}, 400)
 
     if not check_time_limit(token):
-        return ({"errorDesc": "Too many queries in {TIME_LIMIT} seconds!"}, 400)
+        return ({"errorDesc": "Too many queries in {0} seconds!".format(TIME_LIMIT)}, 400)
         
             
     # Now, we can start to run the checks. We define a list to which we append the results from each check.
