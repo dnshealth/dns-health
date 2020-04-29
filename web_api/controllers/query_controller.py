@@ -1,6 +1,12 @@
 import connexion
 import six
-from .. import checks
+import os
+import sys
+
+path = os.path.dirname(os.getcwd())
+sys.path.insert(0, path)
+
+import src.checks
 import dns.name
 import redis
 from datetime import datetime
