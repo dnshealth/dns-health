@@ -4,8 +4,8 @@ import redis
 import uuid
 from datetime import datetime
 
-# from swagger_server.models.token import Token  # noqa: E501
-# from swagger_server import util
+from swagger_server.models.token import Token  # noqa: E501
+from swagger_server import util
 
 # Generate token save it to Redis database and pass it to the user
 def get_token():  # noqa: E501
