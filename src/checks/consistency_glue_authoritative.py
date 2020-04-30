@@ -144,7 +144,7 @@ def getGlueRecords(domain, list_of_name_servers):
                 
                 return {"response": "error checking the ip of {0}!".format(i) ,"details": e.msg }
 
-            if ip[0] == -1 :
+            if ip["response"] == -1 :
                 return ip
             
             ipv4_reponse_of_the_name_server = dns.query.udp(ipv4_query, getTheIPofAServer(i)["response"])
@@ -158,19 +158,19 @@ def getGlueRecords(domain, list_of_name_servers):
             #basically, our solution works like that. for every ip we get for every server, we delete them from the dictionary.
             #if the dictionary has some extra addresses or one of the results and not in the dictionary, return false.
 
-            for ip[0] in ipv4_answer_of_the_name_server:
+            for ip["response"] in ipv4_answer_of_the_name_server:
                 if i in results:
-                    if ip[0][0].to_text() not in results[i]:
-                        return {"response": False, "details": "{0} could not be found in the glue records for ipv4 addresses".format(ip[0][0].to_text())}
+                    if ip["response"][0].to_text() not in results[i]:
+                        return {"response": False, "details": "{0} could not be found in the glue records for ipv4 addresses".format(ip["response"][0].to_text())}
 
-                    results[i].remove(ip[0][0].to_text())
+                    results[i].remove(ip["response"][0].to_text())
 
-            for ip[0] in ipv6_answer_of_the_name_server: 
+            for ip["response"] in ipv6_answer_of_the_name_server: 
                 if i in results:
-                    if ip[0][0].to_text() not in results[i]:
-                        return {"response": False, "details": "{0} could not be found in the glue records for ipv6 addresses".format(ip[0][0].to_text())}
+                    if ip["response"][0].to_text() not in results[i]:
+                        return {"response": False, "details": "{0} could not be found in the glue records for ipv6 addresses".format(ip["response"][0].to_text())}
 
-                    results[i].remove(ip[0][0].to_text())
+                    results[i].remove(ip["response"][0].to_text())
 
         for _,value in results.items():
             if len(value) != 0:
@@ -179,3 +179,4 @@ def getGlueRecords(domain, list_of_name_servers):
 
 def run(domain, list_of_name_servers):
     return getGlueRecords(domain,list_of_name_servers)
+
