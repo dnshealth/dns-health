@@ -85,7 +85,8 @@ def test_servers(body):  # noqa: E501
     check_id = 0
     list_of_check_results = []
     for outcome in results:
-        list_of_check_results.append({"id":check_id, "result": outcome.get("result"), "key": outcome.get("description")})
+        details = outcome.get("details") if "details" in outcome else outcome.get("description")
+        list_of_check_results.append({"id":check_id, "result": outcome.get("result"), "key": details})
         check_id += 1
 
     #Creates the necessary JSON response as a dictionary
