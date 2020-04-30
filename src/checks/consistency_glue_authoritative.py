@@ -106,7 +106,7 @@ def getGlueRecords(domain, list_of_name_servers):
             answer = response_from_the_servers.additional
 
             (_,response) = __parse_records(answer,RR_pattern,5)
-        except Exception as e:
+        except DNSException as e:
             return {"result": False, "description" :  "Check glue consistency" ,"details": e.msg}
 
         (_, response_from_the_servers)= __ask_servers(response,query)
