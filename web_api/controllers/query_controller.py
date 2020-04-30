@@ -39,7 +39,7 @@ def test_servers(body):  # noqa: E501
     token = body.token
 
     #If the field are empty. return an error
-    if domain == "" or name_servers == []:
+    if domain == "" or domain == None or name_servers == [] or name_servers == None:
         return ({"errorDesc": "One of the fields is empty!"}, 400)
 
     #If the user entered a non valid hostname, stop and don't run the other tests
