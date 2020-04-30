@@ -16,7 +16,7 @@ def getTheIPofAServer(nameOfTheServer):
 
         return {"result": answer,"description": "Check glue consistency" ,"details": "Successfully found the IP!"}
     else:
-        return {"result": -1, "description": "Check glue consistency","details": "No A records for {0} server were found!".format(nameOfTheServer)}
+        return {"result": False, "description": "Check glue consistency","details": "No A records for {0} server were found!".format(nameOfTheServer)}
 
 def __ask_servers(list_of_servers, request):
     counter = 0
@@ -143,7 +143,7 @@ def getGlueRecords(domain, list_of_name_servers):
                 
                 return {"result": False, "description" :  "Check glue consistency" ,"details": e.msg}
 
-            if ip["result"] == -1 :
+            if ip["result"] == False :
                 return ip
             
             ipv4_reponse_of_the_name_server = dns.query.udp(ipv4_query, getTheIPofAServer(i)["result"])

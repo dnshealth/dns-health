@@ -13,7 +13,7 @@ def getTheIPofAServer(nameOfTheServer):
     if answer is not None:
         return {"result": answer, "description": "Checking for authoritative answers", "details": "Successfully found the IP!"}
     else:
-        return {"result": -1, "description": "Checking for authoritative answers" ,"details": "No A records for {0} server were found!".format(nameOfTheServer)}
+        return {"result": False, "description": "Checking for authoritative answers" ,"details": "No A records for {0} server were found!".format(nameOfTheServer)}
 
 def getAuthServers(domain, name_servers):
 
@@ -29,7 +29,7 @@ def getAuthServers(domain, name_servers):
                 
             return {"result": False, "description" : "Checking for authoritative answers" ,"details": e.msg }
 
-        if ip["result"] == -1 :
+        if ip["result"] == False :
             
             return {"result": False, "description" : "Checking for authoritative answers" ,"details": e.msg }
 

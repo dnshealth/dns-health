@@ -21,7 +21,7 @@ def getTheIPofAServer(nameOfTheServer):
     if answer is not None:
         return {"result": answer,"description": "Checking of nameserver reachability" ,"details": "Successfully found the IP!"}
     else:
-        return {"result": -1, "description": "Checking of nameserver reachability" ,"details": "No A records for {0} server were found!".format(nameOfTheServer)}
+        return {"result": False, "description": "Checking of nameserver reachability" ,"details": "No A records for {0} server were found!".format(nameOfTheServer)}
 
 #get all the reachable name servers form a given domain/url. 
 #returns a tuple with true if all the name servers are sending back a tcp/udp packet 
@@ -63,7 +63,7 @@ def getReachableNameServers(domain, nameServers):
                 
             return {"result": False, "description" :  "Checking of nameserver reachability" ,"details": e.msg}
 
-        if ip["result"] == -1 :
+        if ip["result"] == False :
             return ip
 
         #try sending a udp packet to see if it's listening on UDP
