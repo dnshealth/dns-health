@@ -2,6 +2,8 @@
 #DNSHEALTH-11
 import dns.resolver
 
+from dns.exception import DNSException
+
 MAX_RDCLASS = 65535
 
 #Helper function to decide wether or not an object(or more specifically a response from a request in our case) is a null pointer or not.
@@ -13,8 +15,13 @@ def isNotNone(obj):
 
 #Helper function to return the IP address of a server
 def getTheIPofAServer(nameOfTheServer):
+
+    try:
     
-    temp  = dns.resolver.Resolver().query(nameOfTheServer,'A')
+        temp  = dns.resolver.Resolver().query(nameOfTheServer,'A')
+    
+    except dns.resolver.NXDOMAIN as e:
+        return {"result": False, "description": "Checking of nameserver reachability" ,"details": e.msg}
 
     answer = temp.response.answer[0][0].to_text()
 
@@ -85,3 +92,5 @@ def getReachableNameServers(domain, nameServers):
 
 def run(domain, ns):
     return getReachableNameServers(domain,ns)
+
+print(getTheIPofAServer("asdasdasd"))
