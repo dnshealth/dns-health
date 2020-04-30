@@ -179,4 +179,3 @@ def getGlueRecords(domain, list_of_name_servers):
 
 def run(domain, list_of_name_servers):
     return getGlueRecords(domain,list_of_name_servers)
-
