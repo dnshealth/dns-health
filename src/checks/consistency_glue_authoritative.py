@@ -185,5 +185,3 @@ def getGlueRecords(domain, list_of_name_servers):
 
 def run(domain, list_of_name_servers):
     return getGlueRecords(domain,list_of_name_servers)
-
-print(run("kth.se",["a.ns.kth.se","b.ns.kth.se","nic2.lth.se"]))
