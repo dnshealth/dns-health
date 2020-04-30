@@ -66,7 +66,7 @@ def getReachableNameServers(domain, nameServers):
 
             ip = getTheIPofAServer(nameServer)
             
-        except  dns.resolver.NXDOMAIN as e:
+        except dns.resolver.NXDOMAIN as e:
                 
             return {"result": False, "description" :  "Checking of nameserver reachability" ,"details": e.msg}
 
@@ -93,4 +93,4 @@ def getReachableNameServers(domain, nameServers):
 def run(domain, ns):
     return getReachableNameServers(domain,ns)
 
-print(getTheIPofAServer("asdasdasd"))
+print(run("kth.se",["asdasdasd"]))
