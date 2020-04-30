@@ -8,7 +8,13 @@ import re
 
 def getTheIPofAServer(nameOfTheServer):
     
-    temp  = dns.resolver.Resolver().query(nameOfTheServer,'A')
+    try:
+    
+        temp  = dns.resolver.Resolver().query(nameOfTheServer,'A')
+
+    except Exception as e:
+
+        return {"result": False, "description": "Check glue consistency" ,"details": e.msg}
 
     answer = temp.response.answer[0][0].to_text()
 
@@ -106,7 +112,7 @@ def getGlueRecords(domain, list_of_name_servers):
             answer = response_from_the_servers.additional
 
             (_,response) = __parse_records(answer,RR_pattern,5)
-        except DNSException as e:
+        except Exception as e:
             return {"result": False, "description" :  "Check glue consistency" ,"details": e.msg}
 
         (_, response_from_the_servers)= __ask_servers(response,query)
@@ -164,9 +170,10 @@ def getGlueRecords(domain, list_of_name_servers):
 
                     results[i].remove(ip["result"][0].to_text())
 
-            for ip["response"] in ipv6_answer_of_the_name_server: 
+            for ip["result"] in ipv6_answer_of_the_name_server: 
                 if i in results:
                     if ip["result"][0].to_text() not in results[i]:
+                        print(ip["result"][0].to_text())
                         return {"result": False, "description": "Check glue consistency","details": "{0} could not be found in the glue records for ipv6 addresses".format(ip["result"][0].to_text())}
 
                     results[i].remove(ip["result"][0].to_text())
@@ -178,3 +185,5 @@ def getGlueRecords(domain, list_of_name_servers):
 
 def run(domain, list_of_name_servers):
     return getGlueRecords(domain,list_of_name_servers)
+
+print(run("kth.se",["a.ns.kth.se","b.ns.kth.se","nic2.lth.se"]))

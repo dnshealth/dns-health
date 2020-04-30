@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 #DNSHEALTH-11
 import dns.resolver
+import sys
 
 from dns.exception import DNSException
 
@@ -19,8 +20,9 @@ def getTheIPofAServer(nameOfTheServer):
     try:
     
         temp  = dns.resolver.Resolver().query(nameOfTheServer,'A')
-    
-    except dns.resolver.NXDOMAIN as e:
+
+    except Exception as e:
+
         return {"result": False, "description": "Checking of nameserver reachability" ,"details": e.msg}
 
     answer = temp.response.answer[0][0].to_text()
@@ -66,7 +68,7 @@ def getReachableNameServers(domain, nameServers):
 
             ip = getTheIPofAServer(nameServer)
             
-        except dns.resolver.NXDOMAIN as e:
+        except Exception as e:
                 
             return {"result": False, "description" :  "Checking of nameserver reachability" ,"details": e.msg}
 

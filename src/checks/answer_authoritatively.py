@@ -5,8 +5,13 @@ import dns.resolver
 from dns.exception import DNSException
 
 def getTheIPofAServer(nameOfTheServer):
+   try:
     
-    temp  = dns.resolver.Resolver().query(nameOfTheServer,'A')
+        temp  = dns.resolver.Resolver().query(nameOfTheServer,'A')
+
+    except Exception as e:
+
+        return {"result": False, "description": "Checking for authoritative answers" ,"details": e.msg}
 
     answer = temp.response.answer[0][0].to_text()
 
@@ -25,7 +30,7 @@ def getAuthServers(domain, name_servers):
 
             ip = getTheIPofAServer(server)
             
-        except  dns.resolver.NXDOMAIN as e:
+        except Exception as e:
                 
             return {"result": False, "description" : "Checking for authoritative answers" ,"details": e.msg }
 
