@@ -89,13 +89,16 @@
         "properties": {
           "domain": {
             "type": "string",
-            "description": "The domain to be delegated"
+            "description": "The domain to be delegated",
+            "nullable": true
           },
           "nameservers": {
             "type": "array",
             "description": "Name servers as strings",
+            "nullable": true,
             "items": {
-              "type": "string"
+              "type": "string",
+              "nullable": true
             }
           },
           "token": {
