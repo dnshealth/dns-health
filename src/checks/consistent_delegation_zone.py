@@ -45,4 +45,4 @@ def run(hostname, list_of_NS):
     if not all(x == sorted(list_of_NS) for x in list_of_lists):
         return {"description": description, "result": False, "details": "Delegation is not consistent with nameserver records"}
     else:
-        return {"description": description, "result": True, "details": ""}
+        return {"description": description, "result": True, "details": "Delegation is consistent with nameserver records"}
