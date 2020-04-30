@@ -13,11 +13,11 @@ def __ask_servers(list_of_servers, request):
     for server in list_of_servers:
         try:
             response = dns.query.udp(request, server, 0.3)          #Send a request to a DNS server and get the reply
-            return ("OK", response)
+            return (True, response)
         except dns.exception.Timeout:                               #If there's a timeout the loop continues and tries the next server
             counter += 1
             if counter == list_of_servers.__len__():                #If all servers are unavailable then the test fails
-                return ("Failed", None)
+                return (False, None)
             else:
                 continue
 
@@ -157,7 +157,7 @@ def __truncref(domain, authoritative_server):
 
     #Queries root servers and fails if they can't be reached
     (message, response_from_root) = __ask_servers(root_servers, request)
-    if message != "OK":
+    if message != True:
         return {"description": "None of the root DNS servers could be reached", "result":False}
         
 
@@ -171,7 +171,7 @@ def __truncref(domain, authoritative_server):
 
     #Sends query to one of the TLD servers to get info on the nameservers and their glue records
     (message, response_from_TLD) = __ask_servers(TLD_servers, request)
-    if message != "OK":
+    if message != True:
         return {"description": "None of the TLD DNS servers could be reached", "result":False}
 
 
