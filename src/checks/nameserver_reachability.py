@@ -61,7 +61,7 @@ def getReachableNameServers(domain, nameServers):
             
         except  dns.resolver.NXDOMAIN as e:
                 
-            return {"result": -1, "description" :  "Checking of nameserver reachability" ,"details": e.msg }
+            return {"result": False, "description" :  "Checking of nameserver reachability" ,"details": e.msg}
 
         if ip["result"] == -1 :
             return ip
