@@ -92,5 +92,3 @@ def getReachableNameServers(domain, nameServers):
 
 def run(domain, ns):
     return getReachableNameServers(domain,ns)
-
-print(run("kth.se",["asdasdasd"]))
