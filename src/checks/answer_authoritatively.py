@@ -5,8 +5,9 @@ import dns.resolver
 from dns.exception import DNSException
 
 def getTheIPofAServer(nameOfTheServer):
-   try:
-    
+   
+    try:
+
         temp  = dns.resolver.Resolver().query(nameOfTheServer,'A')
 
     except Exception as e:
