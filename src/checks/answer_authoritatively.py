@@ -37,7 +37,7 @@ def getAuthServers(domain, name_servers):
 
         if ip["result"] == False :
             
-            return {"result": False, "description" : "Checking for authoritative answers" ,"details": e.msg }
+            return ip
 
         try:
 
