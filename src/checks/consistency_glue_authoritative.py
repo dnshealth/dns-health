@@ -12,10 +12,10 @@ def getTheIPofAServer(nameOfTheServer):
 
     answer = temp.response.answer[0][0].to_text()
 
-    if answer is not None:
-        return {"response": answer, "details": "Successfully found the ip of {0}!".format(nameOfTheServer)}
+  if answer is not None:
+        return {"result": answer,"description": "Checking the IP of {0}".format(nameOfTheServer) ,"details": "Successfully found the ip of {0}!".format(nameOfTheServer)}
     else:
-        return {"response": -1, "details": "No A records for {0} server were found!".format(nameOfTheServer)}
+        return {"result": -1, "description": "Checking the IP of {0}".format(nameOfTheServer) ,"details": "No A records for {0} server were found!".format(nameOfTheServer)}
 
 def __ask_servers(list_of_servers, request):
     counter = 0
@@ -142,14 +142,14 @@ def getGlueRecords(domain, list_of_name_servers):
             
             except  dns.resolver.NXDOMAIN as e:
                 
-                return {"response": "error checking the ip of {0}!".format(i) ,"details": e.msg }
+                return {"result": -1, "description" :  "error checking the ip of {0}!".format(nameServer) ,"details": e.msg}
 
-            if ip["response"] == -1 :
+            if ip["result"] == -1 :
                 return ip
             
-            ipv4_reponse_of_the_name_server = dns.query.udp(ipv4_query, getTheIPofAServer(i)["response"])
+            ipv4_reponse_of_the_name_server = dns.query.udp(ipv4_query, getTheIPofAServer(i)["result"])
 
-            ipv6_reponse_of_the_name_server = dns.query.udp(ipv6_query, getTheIPofAServer(i)["response"])
+            ipv6_reponse_of_the_name_server = dns.query.udp(ipv6_query, getTheIPofAServer(i)["result"])
 
             ipv4_answer_of_the_name_server = ipv4_reponse_of_the_name_server.answer
 
@@ -158,24 +158,24 @@ def getGlueRecords(domain, list_of_name_servers):
             #basically, our solution works like that. for every ip we get for every server, we delete them from the dictionary.
             #if the dictionary has some extra addresses or one of the results and not in the dictionary, return false.
 
-            for ip["response"] in ipv4_answer_of_the_name_server:
+            for ip["result"] in ipv4_answer_of_the_name_server:
                 if i in results:
-                    if ip["response"][0].to_text() not in results[i]:
-                        return {"response": False, "details": "{0} could not be found in the glue records for ipv4 addresses".format(ip["response"][0].to_text())}
+                    if ip["result"][0].to_text() not in results[i]:
+                        return {"result": False,"description": "IP not in the answer of the name server", "details": "{0} could not be found in the glue records for ipv4 addresses".format(ip["result"][0].to_text())}
 
                     results[i].remove(ip["response"][0].to_text())
 
             for ip["response"] in ipv6_answer_of_the_name_server: 
                 if i in results:
-                    if ip["response"][0].to_text() not in results[i]:
-                        return {"response": False, "details": "{0} could not be found in the glue records for ipv6 addresses".format(ip["response"][0].to_text())}
+                    if ip["result"][0].to_text() not in results[i]:
+                        return {"result": False, "details": "{0} could not be found in the glue records for ipv6 addresses".format(ip["result"][0].to_text())}
 
-                    results[i].remove(ip["response"][0].to_text())
+                    results[i].remove(ip["result"][0].to_text())
 
         for _,value in results.items():
             if len(value) != 0:
-                return {"response": "error in the found addresses", "details": "Extra addresses were found when queried the servers!({0})".format(value)}
-        return {"response": True, "details": "Sucess! There is consistency between glue and authoritative data!"}
+                return {"result": False, "description": "Check glue consistency", "details": "Extra addresses were found when queried the servers!({0})".format(value)}
+        return {"result": True,"description": "Check glue consistency", "details": "Sucess! There is consistency between glue and authoritative data!"}
 
 def run(domain, list_of_name_servers):
     return getGlueRecords(domain,list_of_name_servers)

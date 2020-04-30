@@ -11,9 +11,9 @@ def getTheIPofAServer(nameOfTheServer):
     answer = temp.response.answer[0][0].to_text()
 
     if answer is not None:
-        return {"response": answer, "details": "Successfully found the ip of {0}!".format(nameOfTheServer)}
+        return {"result": answer, "description": "Checking the IP of {0}".format(nameOfTheServer), "details": "Successfully found the IP of {0}!".format(nameOfTheServer)}
     else:
-        return {"response": -1, "details": "No A records for {0} server were found!".format(nameOfTheServer)}
+        return {"result": -1, "description": "Checking the IP of {0}".format(nameOfTheServer),"details": "No A records for {0} server were found!".format(nameOfTheServer)}
 
 def getAuthServers(domain, name_servers):
 
@@ -27,27 +27,27 @@ def getAuthServers(domain, name_servers):
             
         except  dns.resolver.NXDOMAIN as e:
                 
-            return {"response": "error checking the ip of {0}!".format(server) ,"details": e.msg }
+            return {"result": -1, "description" : "Error checking the IP of {0}!".format(server) ,"details": e.msg }
 
-        if ip["response"] == -1 :
+        if ip["result"] == -1 :
             return ip
 
         try:
 
-            var      = dns.message.make_query(domain,dns.rdatatype.SOA)
+            var = dns.message.make_query(domain,dns.rdatatype.SOA)
 
-            response = dns.query.udp(var, getTheIPofAServer(server)["response"])
+            response = dns.query.udp(var, getTheIPofAServer(server)["result"])
         
         except DNSException as e:
             
-            return {"response": -1, "details": str(e)}
+            return {"result": -1,"description" : "DNS error occured!", "details": str(e)}
 
         answer   = response.answer
 
         if len(answer) == 0:
-            return {"response": False , "details": "Resolved 0 authoritative servers"}
+            return {"result": False ,"description": "Checking of authoritative servers", "details": "Resolved 0 authoritative servers"}
 
-    return {"response": True, "details": "Successfully validated authoritative answers"}
+    return {"result": True,"description": "Checking of authoritative servers" ,"details": "Successfully validated authoritative answers"}
 
 
 def run(domain, list_of_name_servers):
