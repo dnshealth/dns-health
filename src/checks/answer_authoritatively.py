@@ -11,9 +11,9 @@ def getTheIPofAServer(nameOfTheServer):
     answer = temp.response.answer[0][0].to_text()
 
     if answer is not None:
-        return {"result": answer, "description": "Checking the IP of {0}".format(nameOfTheServer), "details": "Successfully found the IP of {0}!".format(nameOfTheServer)}
+        return {"result": answer, "description": "Checking of authoritative servers", "details": "Successfully found the IP!"}
     else:
-        return {"result": -1, "description": "Checking the IP of {0}".format(nameOfTheServer),"details": "No A records for {0} server were found!".format(nameOfTheServer)}
+        return {"result": -1, "description": "Checking of authoritative servers" ,"details": "No A records for {0} server were found!".format(nameOfTheServer)}
 
 def getAuthServers(domain, name_servers):
 
@@ -27,10 +27,11 @@ def getAuthServers(domain, name_servers):
             
         except  dns.resolver.NXDOMAIN as e:
                 
-            return {"result": -1, "description" : "Error checking the IP of {0}!".format(server) ,"details": e.msg }
+            return {"result": False, "description" : "Checking of authoritative servers" ,"details": e.msg }
 
         if ip["result"] == -1 :
-            return ip
+            
+            return {"result": False, "description" : "Checking of authoritative servers" ,"details": e.msg }
 
         try:
 
@@ -40,7 +41,7 @@ def getAuthServers(domain, name_servers):
         
         except DNSException as e:
             
-            return {"result": -1,"description" : "DNS error occured!", "details": str(e)}
+            return {"result": -1,"description" : "Checking of authoritative servers", "details": e.msg}
 
         answer   = response.answer
 

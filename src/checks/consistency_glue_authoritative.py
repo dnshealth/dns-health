@@ -13,9 +13,9 @@ def getTheIPofAServer(nameOfTheServer):
     answer = temp.response.answer[0][0].to_text()
 
   if answer is not None:
-        return {"result": answer,"description": "Checking the IP of {0}".format(nameOfTheServer) ,"details": "Successfully found the ip of {0}!".format(nameOfTheServer)}
+        return {"result": answer,"description": "Check glue consistency" ,"details": "Successfully found the IP!"}
     else:
-        return {"result": -1, "description": "Checking the IP of {0}".format(nameOfTheServer) ,"details": "No A records for {0} server were found!".format(nameOfTheServer)}
+        return {"result": -1, "description": "Check glue consistency","details": "No A records for {0} server were found!".format(nameOfTheServer)}
 
 def __ask_servers(list_of_servers, request):
     counter = 0
@@ -142,7 +142,7 @@ def getGlueRecords(domain, list_of_name_servers):
             
             except  dns.resolver.NXDOMAIN as e:
                 
-                return {"result": -1, "description" :  "error checking the ip of {0}!".format(nameServer) ,"details": e.msg}
+                return {"result": -1, "description" :  "Check glue consistency" ,"details": e.msg}
 
             if ip["result"] == -1 :
                 return ip
@@ -161,14 +161,14 @@ def getGlueRecords(domain, list_of_name_servers):
             for ip["result"] in ipv4_answer_of_the_name_server:
                 if i in results:
                     if ip["result"][0].to_text() not in results[i]:
-                        return {"result": False,"description": "IP not in the answer of the name server", "details": "{0} could not be found in the glue records for ipv4 addresses".format(ip["result"][0].to_text())}
+                        return {"result": False,"description": "Check glue consistency", "details": "{0} could not be found in the glue records for ipv4 addresses".format(ip["result"][0].to_text())}
 
-                    results[i].remove(ip["response"][0].to_text())
+                    results[i].remove(ip["result"][0].to_text())
 
             for ip["response"] in ipv6_answer_of_the_name_server: 
                 if i in results:
                     if ip["result"][0].to_text() not in results[i]:
-                        return {"result": False, "details": "{0} could not be found in the glue records for ipv6 addresses".format(ip["result"][0].to_text())}
+                        return {"result": False, "description": "Check glue consistency","details": "{0} could not be found in the glue records for ipv6 addresses".format(ip["result"][0].to_text())}
 
                     results[i].remove(ip["result"][0].to_text())
 

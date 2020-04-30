@@ -19,9 +19,9 @@ def getTheIPofAServer(nameOfTheServer):
     answer = temp.response.answer[0][0].to_text()
 
     if answer is not None:
-        return {"result": answer,"description": "Checking the IP of {0}".format(nameOfTheServer) ,"details": "Successfully found the ip of {0}!".format(nameOfTheServer)}
+        return {"result": answer,"description": "Checking of nameserver reachability" ,"details": "Successfully found the IP!"}
     else:
-        return {"result": -1, "description": "Checking the IP of {0}".format(nameOfTheServer) ,"details": "No A records for {0} server were found!".format(nameOfTheServer)}
+        return {"result": -1, "description": "Checking of nameserver reachability" ,"details": "No A records for {0} server were found!".format(nameOfTheServer)}
 
 #get all the reachable name servers form a given domain/url. 
 #returns a tuple with true if all the name servers are sending back a tcp/udp packet 
@@ -61,7 +61,7 @@ def getReachableNameServers(domain, nameServers):
             
         except  dns.resolver.NXDOMAIN as e:
                 
-            return {"result": -1, "description" :  "error checking the ip of {0}!".format(nameServer) ,"details": e.msg }
+            return {"result": -1, "description" :  "Checking of nameserver reachability" ,"details": e.msg }
 
         if ip["result"] == -1 :
             return ip
@@ -79,9 +79,9 @@ def getReachableNameServers(domain, nameServers):
 
     for i in results:
         if i["description"]["valid_entry"] == "False":
-            return {"result": False, "description": "Nameserver reachability" , "details": "server {0} did not return a tcp or a udp packet".format(i["name_server"]), "detailed_results": results}
+            return {"result": False, "description": "Checking of nameserver reachability" , "details": "server {0} did not return a tcp or a udp packet".format(i["name_server"]), "detailed_results": results}
 
-    return {"result": True,"description": "Nameserver reachability" ,"details": "All the name servers successfully returned a tcp and a udp packet!", "detailed_results": results}
+    return {"result": True,"description": "Checking of nameserver reachability" ,"details": "All the name servers successfully returned a tcp and a udp packet!", "detailed_results": results}
 
 def run(domain, ns):
     return getReachableNameServers(domain,ns)
