@@ -12,7 +12,8 @@ def getTheIPofAServer(nameOfTheServer):
 
     answer = temp.response.answer[0][0].to_text()
 
-  if answer is not None:
+    if answer is not None :
+
         return {"result": answer,"description": "Check glue consistency" ,"details": "Successfully found the IP!"}
     else:
         return {"result": -1, "description": "Check glue consistency","details": "No A records for {0} server were found!".format(nameOfTheServer)}
