@@ -28,7 +28,7 @@ def run(hostname, list_of_NS):
     if not soa_check[0]:
         return {"description": description, "result": False, "details": soa_check[1]}
     else:
-        return {"description": description, "result": True}
+        return {"description": description, "result": True, "details": soa_check[1]}
 
 
 def consistent(hostname, list_of_NS, qtype):
