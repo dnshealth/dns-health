@@ -8,7 +8,12 @@ def getTheIPofAServer(nameOfTheServer):
     
     temp  = dns.resolver.Resolver().query(nameOfTheServer,'A')
 
-    return temp.response.answer[0][0].to_text()
+    answer = temp.response.answer[0][0].to_text()
+
+    if answer is not None:
+        return {"response": answer, "details": "Successfully found the ip of {0}!".format(nameOfTheServer)}
+    else:
+        return {"response": -1, "details": "No A records for {0} server were found!".format(nameOfTheServer)}
 
 def getAuthServers(domain, name_servers):
 
@@ -18,22 +23,32 @@ def getAuthServers(domain, name_servers):
 
         try:
 
+            ip = getTheIPofAServer(server)
+            
+        except  dns.resolver.NXDOMAIN as e:
+                
+            return {"response": "error checking the ip of {0}!".format(server) ,"details": e.msg }
+
+        if ip["response"] == -1 :
+            return ip
+
+        try:
+
             var      = dns.message.make_query(domain,dns.rdatatype.SOA)
 
-            response = dns.query.udp(var, getTheIPofAServer(server))
+            response = dns.query.udp(var, getTheIPofAServer(server)["response"])
         
-        except DNSException:
-            return False
+        except DNSException as e:
+            
+            return {"response": -1, "details": str(e)}
 
         answer   = response.answer
 
         if len(answer) == 0:
-            return False
+            return {"response": False , "details": "Resolved 0 authoritative servers"}
 
-    return True
+    return {"response": True, "details": "Successfully validated authoritative answers"}
 
 
 def run(domain, list_of_name_servers):
-    answer = getAuthServers(domain,list_of_name_servers)
-
-    return {'description':"answer authoritatively", 'result': answer}
+    return getAuthServers(domain,list_of_name_servers)
