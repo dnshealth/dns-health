@@ -72,4 +72,4 @@ def consistent(hostname, list_of_NS, qtype):
     if not all(list_of_lists[0] == i for i in list_of_lists):
         return (False, "Inconsistent NS or SOA records")
     else:
-        return (True, "")
+        return (True, "Consistent NS and SOA records")

@@ -14,14 +14,17 @@ def run(hostname, list_of_NS):
         return {"description": description, "result": False, "details": "hostname is too long (more than 255 charaters)"}
 
     if hostname[-1] == ".":
-        # strip end dot, if present
+        # Strip end dot, if present
         hostname = hostname[:-1]
 
-    # regex to check for invalid simbols
+    # Regex to check for invalid simbols
     allowed = re.compile("(?!-)[A-Z\d-]{1,63}(?<!-)$", re.IGNORECASE)
     # Return True if all parts of hostname are valid
     result = all(allowed.match(x) for x in hostname.split("."))
     # Also check that the nameservers have correct format
     result &= all(allowed.match(y) for x in list_of_NS for y in x.split("."))
 
-    return {"description": description, "result": result, "details": "hostname or/and nameservers include illegal characters"}
+    if not result:
+        return {"description": description, "result": result, "details": "hostname or/and nameservers include illegal characters"}
+    else:
+        return {"description": description, "result": result, "details": "hostname and nameservers valid"}
