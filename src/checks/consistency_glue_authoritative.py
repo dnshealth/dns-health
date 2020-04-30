@@ -106,14 +106,12 @@ def getGlueRecords(domain, list_of_name_servers):
             answer = response_from_the_servers.additional
 
             (_,response) = __parse_records(answer,RR_pattern,5)
-        except:
-            return False
+        except Exception as e:
+            return {"result": False, "description" :  "Check glue consistency" ,"details": e.msg}
 
         (_, response_from_the_servers)= __ask_servers(response,query)
 
         additional_section = response_from_the_servers.additional
-
-        #i[0] contains both ip's and ip's
 
         results = {}
 
@@ -143,7 +141,7 @@ def getGlueRecords(domain, list_of_name_servers):
             
             except  dns.resolver.NXDOMAIN as e:
                 
-                return {"result": -1, "description" :  "Check glue consistency" ,"details": e.msg}
+                return {"result": False, "description" :  "Check glue consistency" ,"details": e.msg}
 
             if ip["result"] == -1 :
                 return ip
@@ -180,3 +178,5 @@ def getGlueRecords(domain, list_of_name_servers):
 
 def run(domain, list_of_name_servers):
     return getGlueRecords(domain,list_of_name_servers)
+
+print(run("kth.se",["a.ns.kth.se","b.bs.kth.se","nic2.lth.se","ns2.chalmers.se"]))
