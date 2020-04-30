@@ -24,42 +24,48 @@ def __ask_servers(list_of_servers, request):
 
 #Checks for a server IP addresses from the given section of a DNS server's response 
 def __parse_records(list_of_records, pattern, group):
- counter = 0
- servers = []
+    counter = 0
+    servers = []
 
- #Check all records of response section
- for text_response in list_of_records:
-    counter += 1
+    #Check all records of response section
+    for text_response in list_of_records:
+        counter += 1
 
-    record = re.search(pattern, text_response.to_text(), re.VERBOSE)         #Match it with the given regex pattern
+        record = re.search(pattern, text_response.to_text(), re.VERBOSE)         #Match it with the given regex pattern
     
-    if record != None:                                                       #If the match succeeds add the selected part of the record to a list
-        servers.append(record.group(group))
+        if record != None:                                                       #If the match succeeds add the selected part of the record to a list
+            servers.append(record.group(group))
 
-    if counter == list_of_records.__len__() and servers.__len__() == 0:     #If there are no matches with the regex then the parsing fails
-        return ("Failed", [])
+        if counter == list_of_records.__len__() and servers.__len__() == 0:     #If there are no matches with the regex then the parsing fails
+            return (False, [])
 
-    if  counter == list_of_records.__len__():                               #When all records have been checked, exit loop and return a list of the selected fields
-        return ("OK", servers)
+        if  counter == list_of_records.__len__():                               #When all records have been checked, exit loop and return a list of the selected fields
+            return (True, servers)
 
-
+    return (False, [])
 
 
 def run(domain, list_of_servers):
 
-    details = []
+    test_result = True
     #Goes through the list of authoritative name servers for the domain and checks each one
     for server in list_of_servers:
 
         result = __truncref(domain, server)
-        details.append(result)
-        if not result.get('result'):
-            return {"description": "Missing glue records or non-EDNS0 UDP DNS packet support", "result":False, 'details': details}             #If one of them fails the check stops immediately 
+
+        if not result.get("result"):
+            test_result = False
+            break                                                                                                                               #If one of them fails the check stops immediately 
         
         else:
             continue
-    
-    return {"description": "Glue records found, non-EDNS0 UDP DNS packet support verified", "result":True, "details": details}                 #If loop exits without returning all servers passed
+
+    if test_result == False:
+        response  = server + " failed with: {0}".format(result.get("description"))
+    else:
+        response = "All servers passed"
+
+    return {"description": "No truncation of referrals", "result":test_result, "details": response}                                               #If loop exits without returning all servers passed
 
 
 def __truncref(domain, authoritative_server):
@@ -158,8 +164,8 @@ def __truncref(domain, authoritative_server):
 
     #Parses response from root servers to get IP addresses of TLD servers
     (message, TLD_servers) = __parse_records(response_from_root.additional, RR_pattern, IP)
-    if message != "OK":
-        return {"description": "No usable IP addresses were returned by the DNS root servers", "result":False}
+    if message != True:
+        return {"description": "No such Top-level domain", "result":False}
  
     
 
