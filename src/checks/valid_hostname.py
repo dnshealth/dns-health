@@ -11,7 +11,7 @@ def run(hostname, list_of_NS):
 
     # Check if hostname correct length
     if len(hostname) > 255:
-        return {"description": description, "result": False}
+        return {"description": description, "result": False, "details": "hostname is too long (more than 255 charaters)"}
 
     if hostname[-1] == ".":
         # strip end dot, if present
@@ -24,4 +24,4 @@ def run(hostname, list_of_NS):
     # Also check that the nameservers have correct format
     result &= all(allowed.match(y) for x in list_of_NS for y in x.split("."))
 
-    return {"description": description, "result": result}
+    return {"description": description, "result": result, "details": "hostname or/and nameservers include illegal characters"}
