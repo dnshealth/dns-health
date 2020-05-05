@@ -61,11 +61,14 @@ components:
         domain:
           type: string
           description: The domain to be delegated
+          nullable: true
         nameservers:
           type: array
           description: Name servers as strings
+          nullable: true
           items:
             type: string
+            nullable: true
         token:
           type: string
     Token:

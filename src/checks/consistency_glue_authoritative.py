@@ -8,12 +8,21 @@ import re
 
 def getTheIPofAServer(nameOfTheServer):
     
-    temp  = dns.resolver.Resolver().query(nameOfTheServer,'A')
+    try:
+    
+        temp  = dns.resolver.Resolver().query(nameOfTheServer,'A')
 
-    for i in temp.response.answer:
-        for j in i.items:
-            return j.to_text()
+    except Exception as e:
 
+        return {"result": False, "description": "Check glue consistency" ,"details": e.msg}
+
+    answer = temp.response.answer[0][0].to_text()
+
+    if answer is not None :
+
+        return {"result": answer,"description": "Check glue consistency" ,"details": "Successfully found the IP!"}
+    else:
+        return {"result": False, "description": "Check glue consistency","details": "No A records for {0} server were found!".format(nameOfTheServer)}
 
 def __ask_servers(list_of_servers, request):
     counter = 0
@@ -103,14 +112,12 @@ def getGlueRecords(domain, list_of_name_servers):
             answer = response_from_the_servers.additional
 
             (_,response) = __parse_records(answer,RR_pattern,5)
-        except:
-            return False
+        except Exception as e:
+            return {"result": False, "description" :  "Check glue consistency" ,"details": e.msg}
 
         (_, response_from_the_servers)= __ask_servers(response,query)
 
         additional_section = response_from_the_servers.additional
-
-        #i[0] contains both ip's and ip's
 
         results = {}
 
@@ -133,15 +140,21 @@ def getGlueRecords(domain, list_of_name_servers):
             ipv4_query = dns.message.make_query(i,dns.rdatatype.A)
 
             ipv6_query = dns.message.make_query(i,dns.rdatatype.AAAA)
-
+            
             try:
-                ip = getTheIPofAServer(i)
-                ipv4_reponse_of_the_name_server = dns.query.udp(ipv4_query, getTheIPofAServer(i))
 
-                ipv6_reponse_of_the_name_server = dns.query.udp(ipv6_query, getTheIPofAServer(i))
-            except dns.resolver.NXDOMAIN:
-                # If the server can not be resolved, return False, since there are obviously no authoritative data.
-                return False
+                ip = getTheIPofAServer(i)
+            
+            except  dns.resolver.NXDOMAIN as e:
+                
+                return {"result": False, "description" :  "Check glue consistency" ,"details": e.msg}
+
+            if ip["result"] == False :
+                return ip
+            
+            ipv4_reponse_of_the_name_server = dns.query.udp(ipv4_query, getTheIPofAServer(i)["result"])
+
+            ipv6_reponse_of_the_name_server = dns.query.udp(ipv6_query, getTheIPofAServer(i)["result"])
 
             ipv4_answer_of_the_name_server = ipv4_reponse_of_the_name_server.answer
 
@@ -150,27 +163,25 @@ def getGlueRecords(domain, list_of_name_servers):
             #basically, our solution works like that. for every ip we get for every server, we delete them from the dictionary.
             #if the dictionary has some extra addresses or one of the results and not in the dictionary, return false.
 
-            for ip in ipv4_answer_of_the_name_server:
+            for ip["result"] in ipv4_answer_of_the_name_server:
                 if i in results:
-                    if ip[0].to_text() not in results[i]:
-                        return False
+                    if ip["result"][0].to_text() not in results[i]:
+                        return {"result": False,"description": "Check glue consistency", "details": "{0} could not be found in the glue records for ipv4 addresses".format(ip["result"][0].to_text())}
 
-                    results[i].remove(ip[0].to_text())
+                    results[i].remove(ip["result"][0].to_text())
 
-            for ip in ipv6_answer_of_the_name_server: 
+            for ip["result"] in ipv6_answer_of_the_name_server: 
                 if i in results:
-                    if ip[0].to_text() not in results[i]:
-                        return False
+                    if ip["result"][0].to_text() not in results[i]:
+                        print(ip["result"][0].to_text())
+                        return {"result": False, "description": "Check glue consistency","details": "{0} could not be found in the glue records for ipv6 addresses".format(ip["result"][0].to_text())}
 
-                    results[i].remove(ip[0].to_text())
+                    results[i].remove(ip["result"][0].to_text())
 
         for _,value in results.items():
             if len(value) != 0:
-                return False
-
-        return True
+                return {"result": False, "description": "Check glue consistency", "details": "Extra addresses were found when queried the servers!({0})".format(value)}
+        return {"result": True,"description": "Check glue consistency", "details": "Sucess! There is consistency between glue and authoritative data!"}
 
 def run(domain, list_of_name_servers):
-    answer = getGlueRecords(domain,list_of_name_servers)
-
-    return {'description':"Consistency between glue and authoritative data", 'result': answer}
+    return getGlueRecords(domain,list_of_name_servers)

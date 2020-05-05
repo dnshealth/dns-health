@@ -22,11 +22,11 @@ def run(hostname, list_of_NS):
             results = obj.lookup()
             # Extracts only ASN from dictionary and adds them to a list
             listASN.append(results.get('asn'))
-    except:
-        return {"description": "IP address of some nameserver not found", "result": False}
+    except socket.gaierror as err:
+        return {"description": description, "result": False, "details": str(err) + f": could not resolve IP of nameserver {x}"}
 
-    # Checks if all ASN in list are unique
+    # Checks if nameservers ar located in at least 2 different Autonomous Systems
     if  len(set(listASN)) < 2:
-        return {"description": description, "result": False}
+        return {"description": description, "result": False, "details": "all nameservers are located in the same Autonomous System"}
     else:
-        return {"description": description, "result": True}
+        return {"description": description, "result": True, "details": f"nameserver are located at {len(set(listASN))} different Autonumous Systems"}

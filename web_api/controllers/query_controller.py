@@ -39,21 +39,22 @@ def test_servers(body):  # noqa: E501
     token = body.token
 
     #If the field are empty. return an error
-    if domain == "" or name_servers == []:
+    if domain == "" or domain == None or name_servers == [] or name_servers == None or name_servers == [None]:
         return ({"errorDesc": "One of the fields is empty!"}, 400)
 
     #If the user entered a non valid hostname, stop and don't run the other tests
     if not checks.valid_hostname.run(domain, name_servers).get("result"):
         return ({"errorDesc": "Wrong hostname format"}, 400)
-
-        
-        
+   
+    #Checks if a token has been provided
     if token == None or token == "":
         return ({"errorDesc": "No token given!"}, 400)
     
+    #Validates token
     if not check_token(token):
         return ({"errorDesc": "Invalid token!"}, 400)
 
+    #Limits the rate at which the user may query the database 
     if not check_time_limit(token):
         return ({"errorDesc": "Too many queries in {0} seconds!".format(TIME_LIMIT)}, 400)
         
@@ -84,7 +85,8 @@ def test_servers(body):  # noqa: E501
     check_id = 0
     list_of_check_results = []
     for outcome in results:
-        list_of_check_results.append({"id":check_id, "result": outcome.get("result"), "key": outcome.get("description")})
+        details = outcome.get("details") if "details" in outcome else outcome.get("description")
+        list_of_check_results.append({"id":check_id, "result": outcome.get("result"), "key": details})
         check_id += 1
 
     #Creates the necessary JSON response as a dictionary
