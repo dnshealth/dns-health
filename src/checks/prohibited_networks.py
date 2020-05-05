@@ -14,13 +14,15 @@ import ipaddress
 
 def run(domain, ns_list):
     description = "Prohibited Networks"
+
     # Check each ns in ns_list. If one fails, immediately return false. Otherwise, return true after having checked
     # everything
     for ns in ns_list:
-        if not prohibited_check(ns):
-            return {"description": description, "result": False}
+        dictionary = prohibited_check(ns)
+        if not dictionary.get("result"):
+            return {"description": description, "result": False, "details": dictionary.get("details")}
 
-    return {"description": description, "result": True}
+    return {"description": description, "result": True, "details": dictionary.get("details")}
 
 
 def prohibited_check(ns_server):
@@ -31,19 +33,40 @@ def prohibited_check(ns_server):
         result = dns.resolver.query(ns_server, 'A')
     except:
         return False
+    # for ipval in result:
+    #     if (
+    #             ipaddress.ip_address(str(ipval)).is_private or
+    #             ipaddress.ip_address(str(ipval)).is_multicast or
+    #             ipaddress.ip_address(str(ipval)).is_loopback or
+    #             ipaddress.ip_address(str(ipval)) in deprecated_ips or
+    #             ipaddress.ip_address(str(ipval)) in shared_address_space
+    #     ):
+    #         return False
+    #
+    #     else:
+    #         return True
     for ipval in result:
-        if (
-                ipaddress.ip_address(str(ipval)).is_private or
-                ipaddress.ip_address(str(ipval)).is_multicast or
-                ipaddress.ip_address(str(ipval)).is_loopback or
-                ipaddress.ip_address(str(ipval)) in deprecated_ips or
-                ipaddress.ip_address(str(ipval)) in shared_address_space
-        ):
-            return False
+        if ipaddress.ip_address(str(ipval)).is_private:
+            return {"result": False,
+                    "details": "The IP is in a private range. Example: 127.0.0.1 or 192.168.0.1/24"}
 
-        else:
-            return True
+        elif ipaddress.ip_address(str(ipval)).is_multicast:
+            return {"result": False,
+                    "details": "The IP of {0} is in a multicast range. The range of addresses between 244.0.0.0 - 224.0.0.255, is reserved for the use of routing protocols and other low-level topology." .format(ns_server)}
+
+        elif ipaddress.ip_address(str(ipval)).is_loopback:
+            return {"result": False,
+                    "details": "The IP of {0} is in a loopback range. The range of addresses between 127.0.0.0 - 127.255.255.255, is reserved for the use of loopback purposes.".format(ns_server)}
+        elif ipaddress.ip_address(str(ipval)) in deprecated_ips:
+            return {"result": False,
+                    "details": "The IP of {0} is in a deprecated range. The range of addresses {1} are deprecated, so they can't be used for NS.".format(ns_server, str(deprecated_ips))}
+
+        elif ipaddress.ip_address(str(ipval)) in shared_address_space:
+            return {"result": False,
+                    "details": "The IP of {0} is in a shared address space. The range of addresses {1} are for use in ISP CGN deployments and NAT devices that can handle the same addresses occurring both on inbound and outbound interfaces.".format(ns_server, str(shared_address_space))}
+
+    return {"result": True, "details": "All sub checks passed"}
 
 
 # For debugging purposes please use print(prohibited_check("192.88.99.1"))
-
+print(prohibited_check("127.0.0.1"))
