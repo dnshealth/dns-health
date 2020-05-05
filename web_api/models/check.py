@@ -14,7 +14,7 @@ class Check(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, domain: str=None, nameservers: List[str]=None, token: str=None, delegation: bool=False):  # noqa: E501
+    def __init__(self, domain: str=None, nameservers: List[str]=None, token: str=None, delegation: bool=None):  # noqa: E501
         """Check - a model defined in Swagger
 
         :param domain: The domain of this Check.  # noqa: E501
@@ -35,7 +35,7 @@ class Check(Model):
             'domain': 'domain',
             'nameservers': 'nameservers',
             'token': 'token',
-            'delegation': bool
+            'delegation': 'delegation'
 
         }
         self._domain = domain
@@ -123,22 +123,23 @@ class Check(Model):
     
     @property
     def delegation(self) -> bool:
-        """Gets the token of this Check.
+        """Gets the delegation of this Check.
 
 
-        :return: The token of this Check.
-        :rtype: str
+        :return: The delegation of this Check.
+        :rtype: bool
         """
         return self._delegation
 
     @delegation.setter
     def delegation(self, delegation: bool):
-        """Sets the token of this Check.
+        """Sets the delegation of this Check.
 
 
-        :param token: The token of this Check.
-        :type token: str
+        :param delegation: The delegation of this Check.
+        :type delegation: bool
         """
 
         self._delegation = delegation
+
     
