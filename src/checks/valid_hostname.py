@@ -31,5 +31,3 @@ def run(hostname, list_of_NS):
     result &= all(allowed.match(y) for x in list_of_NS for y in x.split("."))
 
     return {"description": description, "result": result}
-
-print(run("google.com.", ["ns1.google.com.", "ns2.google.com."]))
