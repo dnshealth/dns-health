@@ -69,4 +69,4 @@ def prohibited_check(ns_server):
 
 
 # For debugging purposes please use print(prohibited_check("192.88.99.1"))
-print(prohibited_check("127.0.0.1"))
+
