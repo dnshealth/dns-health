@@ -40,9 +40,12 @@ def test_servers(body):  # noqa: E501
     token = body.token
     delegation = body.delegation
 
-    if delegation==True:
+    if delegation == True:
         name_servers = get_nameservers(domain)
 
+    print(domain)
+    print(name_servers)
+    
 
     #If the field are empty. return an error
     if domain == "" or domain == None or name_servers == [] or name_servers == None or name_servers == [None]:
