@@ -14,7 +14,7 @@ class Check(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, domain: str=None, nameservers: List[str]=None, token: str=None):  # noqa: E501
+    def __init__(self, domain: str=None, nameservers: List[str]=None, token: str=None, delegation: bool=False):  # noqa: E501
         """Check - a model defined in Swagger
 
         :param domain: The domain of this Check.  # noqa: E501
@@ -27,17 +27,21 @@ class Check(Model):
         self.swagger_types = {
             'domain': str,
             'nameservers': List[str],
-            'token': str
+            'token': str,
+            'delegation': bool
         }
 
         self.attribute_map = {
             'domain': 'domain',
             'nameservers': 'nameservers',
-            'token': 'token'
+            'token': 'token',
+            'delegation': bool
+
         }
         self._domain = domain
         self._nameservers = nameservers
         self._token = token
+        self._delegation = delegation
 
     @classmethod
     def from_dict(cls, dikt) -> 'Check':
@@ -116,3 +120,25 @@ class Check(Model):
         """
 
         self._token = token
+    
+    @property
+    def delegation(self) -> bool:
+        """Gets the token of this Check.
+
+
+        :return: The token of this Check.
+        :rtype: str
+        """
+        return self._delegation
+
+    @delegation.setter
+    def delegation(self, delegation: bool):
+        """Sets the token of this Check.
+
+
+        :param token: The token of this Check.
+        :type token: str
+        """
+
+        self._delegation = delegation
+    
