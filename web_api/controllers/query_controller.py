@@ -46,17 +46,26 @@ def test_servers(body):  # noqa: E501
     if not checks.valid_hostname.run(domain, name_servers).get("result"):
         return ({"errorDesc": "Wrong hostname format"}, 400)
    
-    #Checks if a token has been provided
-    if token == None or token == "":
-        return ({"errorDesc": "No token given!"}, 400)
-    
-    #Validates token
-    if not check_token(token):
-        return ({"errorDesc": "Invalid token!"}, 400)
+    # Get whitelisted IPs from environmental variables...
+    whitelisted = False
+    if os.environ.get("IP_WHITELIST"):
+        list1 = os.environ.get("IP_WHITELIST").split(" ")
+        if connexion.request.origin in list1:
+            whitelisted = True
 
-    #Limits the rate at which the user may query the database 
-    if not check_time_limit(token):
-        return ({"errorDesc": "Too many queries in {0} seconds!".format(TIME_LIMIT)}, 400)
+    # If IP is not whitelisted, verify the token and that rate limits are followed.
+    if not whitelisted:
+        #Checks if a token has been provided
+        if token == None or token == "":
+            return ({"errorDesc": "No token given!"}, 400)
+    
+        #Validates token
+        if not check_token(token):
+            return ({"errorDesc": "Invalid token!"}, 400)
+
+        #Limits the rate at which the user may query the database 
+        if not check_time_limit(token):
+            return ({"errorDesc": "Too many queries in {0} seconds!".format(TIME_LIMIT)}, 400)
         
             
     # Now, we can start to run the checks. We define a list to which we append the results from each check.
