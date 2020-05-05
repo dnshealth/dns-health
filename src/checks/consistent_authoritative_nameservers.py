@@ -13,17 +13,22 @@ def run(hostname, list_of_NS):
     list_of_NS = set(list_of_NS)
     description = "Consistency between authoritative nameservers"
 
+    # Consistent function return tuple with result: True/False and details
+    ns_check = consistent(hostname, list_of_NS, 'NS')
+    
     # Check if nameserver NS records are consistent if not return False
-    if not consistent(hostname, list_of_NS, 'NS'):
-        return {"description": description, "result": False}
+    if not ns_check[0]:
+        return {"description": description, "result": False, "details": ns_check[1]}
     else:
         pass
 
     # Check if nameserver SOA records are consistent if not return False
-    if not consistent(hostname, list_of_NS, 'SOA'):
-        return {"description": description, "result": False}
+    soa_check = consistent(hostname, list_of_NS, 'SOA')
+    
+    if not soa_check[0]:
+        return {"description": description, "result": False, "details": soa_check[1]}
     else:
-        return {"description": description, "result": True}
+        return {"description": description, "result": True, "details": soa_check[1]}
 
 
 def consistent(hostname, list_of_NS, qtype):
@@ -36,8 +41,8 @@ def consistent(hostname, list_of_NS, qtype):
     try:
         for x in list_of_NS:
             listNSIP.append(socket.gethostbyname(x))
-    except socket.gaierror:
-        return False
+    except socket.gaierror as err:
+        return (False, str(err) + f": could not resolve IP of nameserver {x}")
 
     try:
         # For every nameserver IP redefine the reslovers nameserver and query the hostname from that nameserver
@@ -60,11 +65,11 @@ def consistent(hostname, list_of_NS, qtype):
             list_of_lists.append(sorted(temp))
 
     # If query is refused return false
-    except dns.resolver.NoNameservers:
-        return False
+    except dns.resolver.NoNameservers as err:
+        return (False, str(err) + f": nameserver {name} query was refused")
 
     # Check if first query is equal to all other queries as they need to be the same
     if not all(list_of_lists[0] == i for i in list_of_lists):
-        return False
+        return (False, "Inconsistent NS or SOA records")
     else:
-        return True
+        return (True, "Consistent NS and SOA records")
