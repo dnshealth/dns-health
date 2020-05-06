@@ -40,7 +40,7 @@ def test_servers(body):  # noqa: E501
     domain = body.domain
     name_servers = body.nameservers
     token = body.token
-    captcha = body.recaptcha_respone
+    captcha = body.recaptcha_response
     delegation = body.delegation
     
     if captcha == None or captcha == "":
