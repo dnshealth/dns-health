@@ -14,7 +14,8 @@ class Check(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, domain: str=None, nameservers: List[str]=None, token: str=None):  # noqa: E501
+    
+    def __init__(self, domain: str=None, nameservers: List[str]=None, token: str=None, recaptcha_response: str=None, delegation: bool=None):  # noqa: E501
         """Check - a model defined in Swagger
 
         :param domain: The domain of this Check.  # noqa: E501
@@ -23,21 +24,32 @@ class Check(Model):
         :type nameservers: List[str]
         :param token: The token of this Check.  # noqa: E501
         :type token: str
+        :param recaptcha_response: The recaptcha_response of this Check
+        :type recaptcha_response: str
         """
         self.swagger_types = {
             'domain': str,
             'nameservers': List[str],
-            'token': str
+            'token': str,
+            'recaptcha_response': str,
+            'delegation': bool
+
         }
 
         self.attribute_map = {
             'domain': 'domain',
             'nameservers': 'nameservers',
-            'token': 'token'
+            'token': 'token',
+            'recaptcha_response': 'recaptcha_response',
+            'delegation': 'delegation'
         }
+        
         self._domain = domain
         self._nameservers = nameservers
         self._token = token
+        self._recaptcha_response = recaptcha_response
+        self._delegation = delegation
+
 
     @classmethod
     def from_dict(cls, dikt) -> 'Check':
@@ -116,3 +128,49 @@ class Check(Model):
         """
 
         self._token = token
+        
+
+    @property
+    def recaptcha_response(self) -> str:
+        """Gets the recaptcha_response of this Check.
+        
+        :return: The recaptcha_response of this Check.
+        :rtype: str
+        """
+        return self._recaptcha_response
+    
+    
+    @recaptcha_response.setter
+    def recaptcha_response(self, recaptcha_response: str):
+        """Sets the recaptcha_response of this Check.
+
+
+        :param recaptcha_response: The recaptcha_response of this Check.
+        :type recaptcha_response: str
+        """
+
+        self._recaptcha_response = recaptcha_response
+
+    
+    @property
+    def delegation(self) -> bool:
+        """Gets the delegation of this Check.
+
+
+        :return: The delegation of this Check.
+        :rtype: bool
+        """
+        return self._delegation
+
+    @delegation.setter
+    def delegation(self, delegation: bool):
+        """Sets the delegation of this Check.
+
+
+        :param delegation: The delegation of this Check.
+        :type delegation: bool
+        """
+
+        self._delegation = delegation
+
+
