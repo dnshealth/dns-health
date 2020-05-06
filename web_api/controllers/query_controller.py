@@ -44,10 +44,11 @@ def test_servers(body):  # noqa: E501
     delegation = body.delegation
     
     if captcha == None or captcha == "":
-        return  ({"errorDesc": "No reCaptcha response"}, 400)
+        return  ({"errorDesc": "Check Captcha, Please!"}, 400)
     
-    if not verify_captcha(captcha):
-        return  ({"errorDesc": "reCaptcha verification failed"}, 400)
+    valid_captcha = verify_captcha(captcha)
+    if not valid_captcha[0]:
+        return  ({"errorDesc": f"reCaptcha verification failed *** {str(valid_captcha[1])}"}, 400)
       
     if delegation == True:
         name_servers = get_nameservers(domain)
@@ -132,9 +133,9 @@ def verify_captcha(response):
     
     # json_obj is a dictionary with a boolean 'success' field, thus check if it is true or false
     if json_obj['success']:
-        return True
+        return (True, "")
     else:
-        return False
+        return (False, json_obj["error-codes"])
 
 # Check if token given by client is valid
 def check_token(token):
