@@ -39,12 +39,12 @@ def test_servers(body):  # noqa: E501
     domain = body.domain
     name_servers = body.nameservers
     token = body.token
-    captcha_respone = body.g-recaptcha-response
+    captcha = body.recaptcha_respone
     
-    if captcha_respone == None or captcha_respone == "":
+    if captcha == None or captcha == "":
         return  ({"errorDesc": "No token given!"}, 400)
     
-    if not verify_captcha(captcha_respone):
+    if not verify_captcha(captcha):
         return  ({"errorDesc": "reCaptcha verification failed"}, 400)
 
     # If the field are empty. return an error
