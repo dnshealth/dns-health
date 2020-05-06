@@ -2,19 +2,19 @@ import socket
 
 def run(domain, ns):
     res = unique_ns_list(ns)
-    return {"description": "Unique Nameservers", "result": res}
+    return {"description": "Unique Nameservers", "result": res.get("result"), "details": res.get("details")}
 
 def unique_ns_list(l): # Takes in a list
     if test_len(l):    # Tests if the length of the list is greater than 1
         if unique_ip(l): # If that passes it checks for unique ip
             # print("The servers are more than 1 and unique")
-            return True
+            return {"result": True, "details": "Passed"}
         else:
             # print("Though the servers are more than 1, at least 2 of the servers in the list are not unique")
-            return False
+            return {"result": False, "details": "Though the servers are more than 1, at least 2 of the servers in the list are not unique"}
     else:
         # print("There are less than 2 nameservers ")
-        return False
+        return {"result": False, "details": "There are less than 2 nameservers"}
     
 def test_len(l):
     return len(l)>1
