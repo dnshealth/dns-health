@@ -24,6 +24,8 @@ class Check(Model):
         :type nameservers: List[str]
         :param token: The token of this Check.  # noqa: E501
         :type token: str
+        :param recaptcha_response: The recaptcha_response of this Check
+        :type recaptcha_response: str
         """
         self.swagger_types = {
             'domain': str,
@@ -132,14 +134,14 @@ class Check(Model):
     def recaptcha_response(self) -> str:
         """Gets the recaptcha_response of this Check.
         
-        :return: The recaptcha_respone of this Check.
+        :return: The recaptcha_response of this Check.
         :rtype: str
         """
         return self._recaptcha_response
     
     
     @recaptcha_response.setter
-    def recaptcha_respone(self, recaptcha_respone: str):
+    def recaptcha_response(self, recaptcha_response: str):
         """Sets the recaptcha_response of this Check.
 
 
@@ -147,7 +149,7 @@ class Check(Model):
         :type recaptcha_response: str
         """
 
-        self._recaptcha_response = recaptcha_respone
+        self._recaptcha_response = recaptcha_response
 
     
     @property
