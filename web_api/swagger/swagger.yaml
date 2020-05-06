@@ -71,6 +71,8 @@ components:
             nullable: true
         token:
           type: string
+        delegation:
+          type: boolean
     Token:
       type: object
       properties:

@@ -45,6 +45,6 @@ def run(hostname, list_of_NS):
 
         # A DNS query response came from an unexpected address or port.
         except UnexpectedSource as e:
-            return {"description": description, "result": False}
+            return {"description": description, "result": False, "details": e.msg}
 
-        return {"description": description, "result": True}
+        return {"description": description, "result": True, "details": "Success! Responses from the authoritative name servers contain the same source IP address as the destination IP address."}

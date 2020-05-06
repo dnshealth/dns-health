@@ -17,6 +17,8 @@ def run(hostname, list_of_NS):
         # strip end dot, if present
         hostname = hostname[:-1]
         
+
+
     #strip end dots from nameservers
     for i in range(len(list_of_NS)):
         if list_of_NS[i][-1] == ".":
