@@ -8,6 +8,7 @@ sys.path.insert(0, path)
 
 import src.checks as checks
 import dns.name
+import dns.resolver
 import redis
 from datetime import datetime
 import itertools
@@ -37,6 +38,11 @@ def test_servers(body):  # noqa: E501
     domain = body.domain
     name_servers = body.nameservers
     token = body.token
+    delegation = body.delegation
+
+    if delegation == True:
+        name_servers = get_nameservers(domain)
+    
 
     #If the field are empty. return an error
     if domain == "" or domain == None or name_servers == [] or name_servers == None or name_servers == [None]:
@@ -137,3 +143,18 @@ def check_time_limit(token):
         r.hset("token_hash", token, datetime.now().strftime("%d-%b-%Y (%H:%M:%S.%f)"))
         
         return True
+
+
+def get_nameservers(domain):
+
+    results = []
+
+    try:
+        nameservers = dns.resolver.Resolver().query(domain, "NS")
+
+    except Exception as e:
+        print(e)
+
+    for i in nameservers.response.answer[0]:
+        results.append(i.to_text())
+    return results
