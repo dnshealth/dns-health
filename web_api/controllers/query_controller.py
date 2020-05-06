@@ -42,7 +42,7 @@ def test_servers(body):  # noqa: E501
     captcha = body.recaptcha_respone
     
     if captcha == None or captcha == "":
-        return  ({"errorDesc": "No token given!"}, 400)
+        return  ({"errorDesc": "No reCaptcha response"}, 400)
     
     if not verify_captcha(captcha):
         return  ({"errorDesc": "reCaptcha verification failed"}, 400)
@@ -111,16 +111,13 @@ conn_params = {
     "db": 0
 }
 
-# This is a test key currently TODO change this to the real key
-RECAPTCHA_SECRET_KEY = "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe"
-
 def verify_captcha(response):
     # Creating a url for POST request
     # Google's recaptcha verification api
     url = "https://www.google.com/recaptcha/api/siteverify?"
     
     # Captcha secret key
-    url += 'secret=' + str(RECAPTCHA_SECRET_KEY) + '&'
+    url += 'secret=' + str(os.environ.get("RECAPTCHA_SECRET_KEY")) + '&'
     
     # g-recpatcha-response sent from front end
     url += 'response=' + str(response)
