@@ -29,7 +29,7 @@ class Check(Model):
             'domain': str,
             'nameservers': List[str],
             'token': str,
-            'recaptcha_response': str
+            'recaptcha_response': str,
             'delegation': bool
 
         }
@@ -38,7 +38,7 @@ class Check(Model):
             'domain': 'domain',
             'nameservers': 'nameservers',
             'token': 'token',
-            'recaptcha_response': 'recaptcha_response'
+            'recaptcha_response': 'recaptcha_response',
             'delegation': 'delegation'
         }
         
