@@ -44,11 +44,12 @@ def test_servers(body):  # noqa: E501
     delegation = body.delegation
     
     if captcha == None or captcha == "":
-        return  ({"errorDesc": "Check Captcha, Please!"}, 400)
+        return  ({"errorDesc": "reCaptcha not checked"}, 400)
     
     valid_captcha = verify_captcha(captcha)
     if not valid_captcha[0]:
-        return  ({"errorDesc": f"reCaptcha verification failed *** {str(valid_captcha[1])}"}, 400)
+        print(valid_captcha[1])
+        return  ({"errorDesc": "reCaptcha verification failed"}, 400)
       
     if delegation == True:
         name_servers = get_nameservers(domain)
