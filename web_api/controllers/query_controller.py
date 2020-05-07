@@ -76,6 +76,10 @@ def test_servers(body):  # noqa: E501
             print(valid_captcha[1])
             return  ({"errorDesc": "reCaptcha verification failed"}, 400)
           
+    # If the user entered a non valid hostname, stop and don't run the other tests
+    if not checks.valid_hostname.run(domain, name_servers).get("result"):
+        return ({"errorDesc": "Wrong hostname format"}, 400)
+
     if delegation == True:
         name_servers = get_nameservers(domain)
         
@@ -83,10 +87,6 @@ def test_servers(body):  # noqa: E501
     if domain == "" or domain == None or name_servers == [] or name_servers == None or name_servers == [None]:
         return ({"errorDesc": "One of the fields is empty!"}, 400)
 
-    # If the user entered a non valid hostname, stop and don't run the other tests
-    if not checks.valid_hostname.run(domain, name_servers).get("result"):
-        return ({"errorDesc": "Wrong hostname format"}, 400)
-            
     # Now, we can start to run the checks. We define a list to which we append the results from each check.
     checks_list = [checks.minimal_ns,
                    checks.valid_hostname,
