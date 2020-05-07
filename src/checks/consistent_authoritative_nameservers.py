@@ -4,17 +4,38 @@
 # Returns False if query fails or nameserver IP can not be resolved
 # Returns False if NS records or SOA records are not consistent
 # Returns True if NS records and SOA records are consistent; contain the same information
-import socket
 import dns.resolver
 
 
-def run(hostname, list_of_NS):
+def getTheIPofAServer(nameOfTheServer, ipv6_enabled):
+   
+    try:
+        if(ipv6_enabled):
+            temp  = dns.resolver.Resolver().query(nameOfTheServer,'AAAA')
+        else:
+            temp  = dns.resolver.Resolver().query(nameOfTheServer,'A')
+        
+
+    except Exception as e:
+
+        return {"result": False, "description": "Check consistent authoritative nameservers" ,"details": e.msg}
+
+    answer = temp.response.answer[0][0].to_text()
+
+    if answer is not None:
+        return {"result": answer, "description": "Check consistent authoritative nameservers", "details": "Successfully found the IP!"}
+    elif ipv6_enabled:
+        return {"result": False, "description": "Check consistent authoritative nameservers" ,"details": "No AAAA records for {0} server were found!".format(nameOfTheServer)}
+    else:
+        return {"result": False, "description": "Check consistent authoritative nameservers" ,"details": "No A records for {0} server were found!".format(nameOfTheServer)}
+
+def run(hostname, list_of_NS, ipv6_enabled):
     # Filter out duplicate nameserver entries
     list_of_NS = set(list_of_NS)
     description = "Consistency between authoritative nameservers"
 
     # Consistent function return tuple with result: True/False and details
-    ns_check = consistent(hostname, list_of_NS, 'NS')
+    ns_check = consistent(hostname, list_of_NS, 'NS', ipv6_enabled)
     
     # Check if nameserver NS records are consistent if not return False
     if not ns_check[0]:
@@ -23,7 +44,7 @@ def run(hostname, list_of_NS):
         pass
 
     # Check if nameserver SOA records are consistent if not return False
-    soa_check = consistent(hostname, list_of_NS, 'SOA')
+    soa_check = consistent(hostname, list_of_NS, 'SOA', ipv6_enabled)
     
     if not soa_check[0]:
         return {"description": description, "result": False, "details": soa_check[1]}
@@ -31,18 +52,15 @@ def run(hostname, list_of_NS):
         return {"description": description, "result": True, "details": soa_check[1]}
 
 
-def consistent(hostname, list_of_NS, qtype):
+def consistent(hostname, list_of_NS, qtype, ipv6_enabled):
     listNSIP = []
     list_of_lists = []
     # Dns resolver initialization
     resolver = dns.resolver.Resolver()
 
     # Getting nameserver IPs
-    try:
-        for x in list_of_NS:
-            listNSIP.append(socket.gethostbyname(x))
-    except socket.gaierror as err:
-        return (False, str(err) + f": could not resolve IP of nameserver {x}")
+    for x in list_of_NS:
+        listNSIP.append(getTheIPofAServer(x, ipv6_enabled))
 
     try:
         # For every nameserver IP redefine the reslovers nameserver and query the hostname from that nameserver

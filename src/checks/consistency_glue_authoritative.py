@@ -6,11 +6,14 @@ from dns.exception import DNSException
 
 import re
 
-def getTheIPofAServer(nameOfTheServer):
-    
+def getTheIPofAServer(nameOfTheServer, ipv6_enabled):
+   
     try:
-    
-        temp  = dns.resolver.Resolver().query(nameOfTheServer,'A')
+        if(ipv6_enabled):
+            temp  = dns.resolver.Resolver().query(nameOfTheServer,'AAAA')
+        else:
+            temp  = dns.resolver.Resolver().query(nameOfTheServer,'A')
+        
 
     except Exception as e:
 
@@ -18,11 +21,12 @@ def getTheIPofAServer(nameOfTheServer):
 
     answer = temp.response.answer[0][0].to_text()
 
-    if answer is not None :
-
-        return {"result": answer,"description": "Check glue consistency" ,"details": "Successfully found the IP!"}
+    if answer is not None:
+        return {"result": answer, "description": "Check glue consistency", "details": "Successfully found the IP!"}
+    elif ipv6_enabled:
+        return {"result": False, "description": "Check glue consistency" ,"details": "No AAAA records for {0} server were found!".format(nameOfTheServer)}
     else:
-        return {"result": False, "description": "Check glue consistency","details": "No A records for {0} server were found!".format(nameOfTheServer)}
+        return {"result": False, "description": "Check glue consistency" ,"details": "No A records for {0} server were found!".format(nameOfTheServer)}
 
 def __ask_servers(list_of_servers, request):
     counter = 0
@@ -63,7 +67,7 @@ def __parse_records(list_of_records, pattern, group):
 #takes a domain(not used) and a list of name servers in string format
 #returns true 
 
-def getGlueRecords(domain, list_of_name_servers):
+def getGlueRecords(domain, list_of_name_servers, ipv6_enabled):
 
     #hard coded list of all the root servers
     root_servers = [
@@ -143,7 +147,7 @@ def getGlueRecords(domain, list_of_name_servers):
             
             try:
 
-                ip = getTheIPofAServer(i)
+                ip = getTheIPofAServer(i, ipv6_enabled)
             
             except  dns.resolver.NXDOMAIN as e:
                 
@@ -152,9 +156,9 @@ def getGlueRecords(domain, list_of_name_servers):
             if ip["result"] == False :
                 return ip
             
-            ipv4_reponse_of_the_name_server = dns.query.udp(ipv4_query, getTheIPofAServer(i)["result"])
+            ipv4_reponse_of_the_name_server = dns.query.udp(ipv4_query, getTheIPofAServer(i, ipv6_enabled)["result"])
 
-            ipv6_reponse_of_the_name_server = dns.query.udp(ipv6_query, getTheIPofAServer(i)["result"])
+            ipv6_reponse_of_the_name_server = dns.query.udp(ipv6_query, getTheIPofAServer(i, ipv6_enabled)["result"])
 
             ipv4_answer_of_the_name_server = ipv4_reponse_of_the_name_server.answer
 
@@ -183,5 +187,5 @@ def getGlueRecords(domain, list_of_name_servers):
                 return {"result": False, "description": "Check glue consistency", "details": "Extra addresses were found when queried the servers!({0})".format(value)}
         return {"result": True,"description": "Check glue consistency", "details": "Sucess! There is consistency between glue and authoritative data!"}
 
-def run(domain, list_of_name_servers):
-    return getGlueRecords(domain,list_of_name_servers)
+def run(domain, list_of_name_servers, ipv6_enabled):
+    return getGlueRecords(domain,list_of_name_servers, ipv6_enabled)

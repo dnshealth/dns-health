@@ -7,7 +7,29 @@ import socket
 import dns.resolver
 
 
-def run(hostname, list_of_NS):
+def getTheIPofAServer(nameOfTheServer, ipv6_enabled):
+   
+    try:
+        if(ipv6_enabled):
+            temp  = dns.resolver.Resolver().query(nameOfTheServer,'AAAA')
+        else:
+            temp  = dns.resolver.Resolver().query(nameOfTheServer,'A')
+        
+
+    except Exception as e:
+
+        return {"result": False, "description": "Check consistent delegation zone" ,"details": e.msg}
+
+    answer = temp.response.answer[0][0].to_text()
+
+    if answer is not None:
+        return {"result": answer, "description": "Check consistent delegation zone", "details": "Successfully found the IP!"}
+    elif ipv6_enabled:
+        return {"result": False, "description": "Check consistent delegation zone" ,"details": "No AAAA records for {0} server were found!".format(nameOfTheServer)}
+    else:
+        return {"result": False, "description": "Check consistent delegation zone" ,"details": "No A records for {0} server were found!".format(nameOfTheServer)}
+
+def run(hostname, list_of_NS, ipv6_enabled):
     description = "Consistency between delegation and zone"
     listNSIP = []
     list_of_lists = []
@@ -17,7 +39,7 @@ def run(hostname, list_of_NS):
     # Getting nameserver IPs
     try:
         for x in list_of_NS:
-            listNSIP.append(socket.gethostbyname(x))
+            listNSIP.append(getTheIPofAServer(x, ipv6_enabled))
     except socket.gaierror as err:
         return {"description": description, "result": False, "details": str(err) + f": could not resolve IP of nameserver {x}"}
 

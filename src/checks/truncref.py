@@ -4,6 +4,7 @@ import dns.name
 import dns.message
 import dns.query
 import dns.exception
+import dns.resolver
 
 
 
@@ -45,13 +46,13 @@ def __parse_records(list_of_records, pattern, group):
     return (False, [])
 
 
-def run(domain, list_of_servers):
+def run(domain, list_of_servers, ipv6_enabled):
 
     test_result = True
     #Goes through the list of authoritative name servers for the domain and checks each one
     for server in list_of_servers:
 
-        result = __truncref(domain, server)
+        result = __truncref(domain, server, ipv6_enabled)
 
         if not result.get("result"):
             test_result = False
@@ -68,7 +69,7 @@ def run(domain, list_of_servers):
     return {"description": "No truncation of referrals", "result":test_result, "details": response}                                               #If loop exits without returning all servers passed
 
 
-def __truncref(domain, authoritative_server):
+def __truncref(domain, authoritative_server, ipv6_enabled):
 
     #Makes sure that both domains with and without a period at the end work
     authoritative_server = authoritative_server if authoritative_server[-1:] == '.' else authoritative_server + '.'
@@ -146,12 +147,20 @@ def __truncref(domain, authoritative_server):
 
     #Create a DNS query message asking for the A record of the domain, EDNS is not
     #used since that would result in UDP packets larger than 512 octets.
-    request = dns.message.make_query(
-        domain_name,             #Name of the query
-        'A',                #Type of record
-        'IN',               #Record class
-        False,              #Should EDNS be used?
-    )
+    if ipv6_enabled:
+        request = dns.message.make_query(
+            domain_name,             #Name of the query
+            'AAAA',                #Type of record
+            'IN',               #Record class
+            False,              #Should EDNS be used?
+        )
+    else:
+        request = dns.message.make_query(
+            domain_name,             #Name of the query
+            'A',                #Type of record
+            'IN',               #Record class
+            False,              #Should EDNS be used?
+        )
 
 
 

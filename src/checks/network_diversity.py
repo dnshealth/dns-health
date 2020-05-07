@@ -5,25 +5,44 @@
 # Returns True id all ASN of nameservers are unique
 from ipwhois.net import Net
 from ipwhois.asn import IPASN
-import socket
+import dns.resolver
 
 
+def getTheIPofAServer(nameOfTheServer, ipv6_enabled):
+   
+    try:
+        if(ipv6_enabled):
+            temp  = dns.resolver.Resolver().query(nameOfTheServer,'AAAA')
+        else:
+            temp  = dns.resolver.Resolver().query(nameOfTheServer,'A')
+        
 
-def run(hostname, list_of_NS):
+    except Exception as e:
+
+        return {"result": False, "description": "Check network diversity" ,"details": e.msg}
+
+    answer = temp.response.answer[0][0].to_text()
+
+    if answer is not None:
+        return {"result": answer, "description": "Check network diversity", "details": "Successfully found the IP!"}
+    elif ipv6_enabled:
+        return {"result": False, "description": "Check network diversity" ,"details": "No AAAA records for {0} server were found!".format(nameOfTheServer)}
+    else:
+        return {"result": False, "description": "Check network diversity" ,"details": "No A records for {0} server were found!".format(nameOfTheServer)}
+
+
+def run(hostname, list_of_NS, ipv6_enabled):
     description = "Network diversity"
     listASN = []
 
-    try:
-        for x in list_of_NS:
-            # Getting IPs of nameservers
-            net = Net(socket.gethostbyname(x))
-            obj = IPASN(net)
-            # Getting dictionary with AS info for specific IP
-            results = obj.lookup()
-            # Extracts only ASN from dictionary and adds them to a list
-            listASN.append(results.get('asn'))
-    except socket.gaierror as err:
-        return {"description": description, "result": False, "details": str(err) + f": could not resolve IP of nameserver {x}"}
+    for x in list_of_NS:
+        # Getting IPs of nameservers
+        net = Net(getTheIPofAServer(x, ipv6_enabled))
+        obj = IPASN(net)
+        # Getting dictionary with AS info for specific IP
+        results = obj.lookup()
+        # Extracts only ASN from dictionary and adds them to a list
+        listASN.append(results.get('asn'))
 
     # Checks if nameservers ar located in at least 2 different Autonomous Systems
     if  len(set(listASN)) < 2:

@@ -12,7 +12,7 @@ import dns.flags
 from dns.query import UnexpectedSource
 
 
-def run(hostname, list_of_NS):
+def run(hostname, list_of_NS, ipv6_enabled):
 
     description = "Same source address as destination address"
     # Save parameters to variables

@@ -6,7 +6,7 @@
 import re
 
 
-def run(hostname, list_of_NS):
+def run(hostname, list_of_NS, ipv6_enabled):
     description = "Valid hostnames"
 
     # Check if hostname correct length

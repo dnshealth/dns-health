@@ -14,24 +14,6 @@ def isNotNone(obj):
     else:
         return False
 
-#Helper function to return the IP address of a server
-def getTheIPofAServer(nameOfTheServer):
-
-    try:
-    
-        temp  = dns.resolver.Resolver().query(nameOfTheServer,'A')
-
-    except Exception as e:
-
-        return {"result": False, "description": "Checking of nameserver reachability" ,"details": e.msg}
-
-    answer = temp.response.answer[0][0].to_text()
-
-    if answer is not None:
-        return {"result": answer,"description": "Checking of nameserver reachability" ,"details": "Successfully found the IP!"}
-    else:
-        return {"result": False, "description": "Checking of nameserver reachability" ,"details": "No A records for {0} server were found!".format(nameOfTheServer)}
-
 #get all the reachable name servers form a given domain/url. 
 #returns a tuple with true if all the name servers are sending back a tcp/udp packet 
 # and a dictionary with 3 fields:
@@ -39,7 +21,7 @@ def getTheIPofAServer(nameOfTheServer):
 # "received_udp_packet" field for wether or not this nameserver sent a udp packet back
 # "received_tcp_packet" field for wether or not this nameserver sent a tcp packet back
 
-def getReachableNameServers(domain, nameServers):
+def getReachableNameServers(domain, nameServers, ipv6_enabled):
     # Nameservers are passed as params
 
     #create an empty list where we can store all the nameservers we found
@@ -66,7 +48,7 @@ def getReachableNameServers(domain, nameServers):
         
         try:
 
-            ip = getTheIPofAServer(nameServer)
+            ip = getTheIPofAServer(nameServer, ipv6_enabled)
             
         except Exception as e:
                 
@@ -92,5 +74,28 @@ def getReachableNameServers(domain, nameServers):
 
     return {"result": True,"description": "Checking of nameserver reachability" ,"details": "All the name servers successfully returned a tcp and a udp packet!", "detailed_results": results}
 
-def run(domain, ns):
-    return getReachableNameServers(domain,ns)
+def run(domain, ns, ipv6_enabled):
+    return getReachableNameServers(domain,ns, ipv6_enabled)
+
+
+def getTheIPofAServer(nameOfTheServer, ipv6_enabled):
+   
+    try:
+        if(ipv6_enabled):
+            temp  = dns.resolver.Resolver().query(nameOfTheServer,'AAAA')
+        else:
+            temp  = dns.resolver.Resolver().query(nameOfTheServer,'A')
+        
+
+    except Exception as e:
+
+        return {"result": False, "description": "Check minimal nameservers" ,"details": e.msg}
+
+    answer = temp.response.answer[0][0].to_text()
+
+    if answer is not None:
+        return {"result": answer, "description": "Check minimal nameservers", "details": "Successfully found the IP!"}
+    elif ipv6_enabled:
+        return {"result": False, "description": "Check minimal nameservers" ,"details": "No AAAA records for {0} server were found!".format(nameOfTheServer)}
+    else:
+        return {"result": False, "description": "Check minimal nameservers" ,"details": "No A records for {0} server were found!".format(nameOfTheServer)}
