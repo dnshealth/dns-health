@@ -43,19 +43,15 @@ def test_servers(body):  # noqa: E501
     captcha = body.recaptcha_response
     delegation = body.delegation
 
-    # If the field are empty. return an error
-    if domain == "" or domain == None or name_servers == [] or name_servers == None or name_servers == [None]:
-        return ({"errorDesc": "One of the fields is empty!"}, 400)
-
-    # If the user entered a non valid hostname, stop and don't run the other tests
-    if not checks.valid_hostname.run(domain, name_servers).get("result"):
-        return ({"errorDesc": "Wrong hostname format"}, 400)
-   
     # Get whitelisted IPs from environmental variables...
     whitelisted = False
     if os.environ.get("IP_WHITELIST"):
         list1 = os.environ.get("IP_WHITELIST").split(" ")
-        if connexion.request.origin in list1:
+        if connexion.request.headers.getlist("X-Forwarded-For"):
+            ip = connexion.request.headers.getlist("X-Forwarded-For")[0]
+        else:
+            ip = connexion.request.origin
+        if ip in list1:
             whitelisted = True
 
     # If IP is not whitelisted, verify the token and that rate limits are followed.
@@ -83,6 +79,13 @@ def test_servers(body):  # noqa: E501
     if delegation == True:
         name_servers = get_nameservers(domain)
         
+    # If the field are empty. return an error
+    if domain == "" or domain == None or name_servers == [] or name_servers == None or name_servers == [None]:
+        return ({"errorDesc": "One of the fields is empty!"}, 400)
+
+    # If the user entered a non valid hostname, stop and don't run the other tests
+    if not checks.valid_hostname.run(domain, name_servers).get("result"):
+        return ({"errorDesc": "Wrong hostname format"}, 400)
             
     # Now, we can start to run the checks. We define a list to which we append the results from each check.
     checks_list = [checks.minimal_ns,
