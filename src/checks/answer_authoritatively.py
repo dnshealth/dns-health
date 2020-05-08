@@ -34,7 +34,7 @@ def getAuthServers(domain, name_servers, ipv6_enabled):
 
         try:
 
-            ip = getTheIPofAServer(server, ipv6_enabled)
+            ip = getTheIPofAServer(server, False)
             
         except Exception as e:
                 
@@ -48,7 +48,7 @@ def getAuthServers(domain, name_servers, ipv6_enabled):
 
             var = dns.message.make_query(domain,dns.rdatatype.SOA)
 
-            response = dns.query.udp(var, getTheIPofAServer(server, ipv6_enabled)["result"])
+            response = dns.query.udp(var, getTheIPofAServer(server, False)["result"])
         
         except DNSException as e:
             

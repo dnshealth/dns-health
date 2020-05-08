@@ -14,15 +14,16 @@ def getTheIPofAServer(nameOfTheServer, ipv6_enabled):
         if(ipv6_enabled):
             temp  = dns.resolver.Resolver().query(nameOfTheServer,'AAAA')
         else:
+            
             temp  = dns.resolver.Resolver().query(nameOfTheServer,'A')
+            
         
 
     except Exception as e:
-
-        return {"result": False, "description": "Check network diversity" ,"details": e.msg}
-
+        return {"result": False, "description": "Check network diversity" ,"details": e}
+    
     answer = temp.response.answer[0][0].to_text()
-
+    
     if answer is not None:
         return {"result": answer, "description": "Check network diversity", "details": "Successfully found the IP!"}
     elif ipv6_enabled:
@@ -37,7 +38,8 @@ def run(hostname, list_of_NS, ipv6_enabled):
 
     for x in list_of_NS:
         # Getting IPs of nameservers
-        net = Net(getTheIPofAServer(x, ipv6_enabled))
+        
+        net = Net(getTheIPofAServer(x, False)["result"])
         obj = IPASN(net)
         # Getting dictionary with AS info for specific IP
         results = obj.lookup()

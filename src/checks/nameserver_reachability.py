@@ -48,7 +48,8 @@ def getReachableNameServers(domain, nameServers, ipv6_enabled):
         
         try:
 
-            ip = getTheIPofAServer(nameServer, ipv6_enabled)
+            ip = getTheIPofAServer(nameServer, False)
+            
             
         except Exception as e:
                 
@@ -56,14 +57,18 @@ def getReachableNameServers(domain, nameServers, ipv6_enabled):
 
         if ip["result"] == False :
             return ip
-
+        
+        
         #try sending a udp packet to see if it's listening on UDP
         udpPacket = dns.query.udp(query,ip["result"])
+        
 
         #try sending a tcp packet to see if it's listening on TCP
         tcpPacket = dns.query.tcp(query,ip["result"])
+        
 
         if isNotNone(udpPacket) and isNotNone(tcpPacket):
+            
             results.append({ "name_server" : nameServer,"description": {"valid_entry" : str(True), "received_udp_packet" : isNotNone(udpPacket),"received_tcp_packet" : isNotNone(tcpPacket)}})
         else:
             results.append({ "name_server" : nameServer,"description": {"valid_entry" : str(False), "received_udp_packet" : isNotNone(udpPacket),"received_tcp_packet" : isNotNone(tcpPacket)}})
@@ -92,7 +97,6 @@ def getTheIPofAServer(nameOfTheServer, ipv6_enabled):
         return {"result": False, "description": "Check minimal nameservers" ,"details": e.msg}
 
     answer = temp.response.answer[0][0].to_text()
-
     if answer is not None:
         return {"result": answer, "description": "Check minimal nameservers", "details": "Successfully found the IP!"}
     elif ipv6_enabled:

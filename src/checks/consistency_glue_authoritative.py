@@ -156,9 +156,9 @@ def getGlueRecords(domain, list_of_name_servers, ipv6_enabled):
             if ip["result"] == False :
                 return ip
             
-            ipv4_reponse_of_the_name_server = dns.query.udp(ipv4_query, getTheIPofAServer(i, ipv6_enabled)["result"])
+            ipv4_reponse_of_the_name_server = dns.query.udp(ipv4_query, getTheIPofAServer(i, False)["result"])
 
-            ipv6_reponse_of_the_name_server = dns.query.udp(ipv6_query, getTheIPofAServer(i, ipv6_enabled)["result"])
+            ipv6_reponse_of_the_name_server = dns.query.udp(ipv6_query, getTheIPofAServer(i, False)["result"])
 
             ipv4_answer_of_the_name_server = ipv4_reponse_of_the_name_server.answer
 

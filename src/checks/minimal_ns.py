@@ -21,11 +21,11 @@ def test_len(l):
 
 def unique_ip(l, ipv6_enabled):
     try: 
-        y = getTheIPofAServer(l[0], ipv6_enabled) # Will return the ip adress of the host adress
+        y = getTheIPofAServer(l[0], ipv6_enabled)["result"] # Will return the ip adress of the host adress
         l2 = l[1:] # creates a list starting from the second element
         for x in l2: # "for each" loop for every element in the second list
             try:
-                if y == getTheIPofAServer(x, ipv6_enabled):
+                if y == getTheIPofAServer(x, ipv6_enabled)["result"]:
                     return False # if the comparison ever detects same host ip it will return false
                 elif len(l2)<2:
                     return True # if the second list is ever lesser than 2 then it will return true
