@@ -80,12 +80,15 @@ def test_servers(body):  # noqa: E501
             print(valid_captcha[1])
             return  ({"errorDesc": "reCaptcha verification failed"}, 400)
           
-    # If the user entered a non valid hostname, stop and don't run the other tests
-    if not checks.valid_hostname.run(domain, name_servers).get("result"):
-       return ({"errorDesc": "Wrong hostname format"}, 400)
-      
     if delegation == True:
         name_servers = get_nameservers(domain)
+        if name_servers is None:
+            return ({"errorDesc": "This domain has no delegated nameservers."}, 400)
+
+    # If the user entered a non valid hostname, stop and don't run the other tests
+    if not checks.valid_hostname.run(domain, name_servers).get("result"):
+        return ({"errorDesc": "Wrong hostname format"}, 400)
+
     if domain == "" or domain == None or name_servers == [] or name_servers == None or name_servers == [None]:
         return ({"errorDesc": "One of the fields is empty!"}, 400)
       
@@ -154,6 +157,7 @@ def get_nameservers(domain):
 
     except Exception as e:
         print(e)
+        return None
 
     for i in nameservers.response.answer[0]:
         results.append(i.to_text())
