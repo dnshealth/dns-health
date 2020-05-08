@@ -41,50 +41,29 @@ def test_servers(body):  # noqa: E501
 
     :rtype:(dictionary, int)
     """
-    #Converts request to object of type Check
+    # Converts request to object of type Check
     if connexion.request.is_json:
         body = Check.from_dict(connexion.request.get_json())  # noqa: E501
 
-    #Extract the domain string and name server list and token string from the Check object
+    # Extract the domain string and name server list and token string and recpatcha response from the Check object
     domain = body.domain
     name_servers = body.nameservers
     token = body.token
     captcha = body.recaptcha_response
     delegation = body.delegation
-
-    validation_response = validate_request(domain,name_servers,token,captcha)
-
-    if validation_response != True:
-        return validation_response
-
-    if delegation == True:
-        name_servers = get_nameservers(domain)
-
-    return helpers.return_results(domain,name_servers,[])
-
-def validate_request(domain, name_servers, token, captcha):
     
-    if domain == "" or domain == None or name_servers == [] or name_servers == None or name_servers == [None]:
-        return ({"errorDesc": "One of the fields is empty!"}, 400)
-
-    # If the user entered a non valid hostname, stop and don't run the other tests
-    if not checks.valid_hostname.run(domain, name_servers).get("result"):
-        return ({"errorDesc": "Wrong hostname format"}, 400)
-   
-    # Get whitelisted IPs from environmental variables...
     whitelisted = False
-    
     if os.environ.get("IP_WHITELIST"):
         list1 = os.environ.get("IP_WHITELIST").split(" ")
         if connexion.request.origin in list1:
             whitelisted = True
-
+            
     # If IP is not whitelisted, verify the token and that rate limits are followed.
     if not whitelisted:
         #Checks if a token has been provided
         if token == None or token == "":
             return ({"errorDesc": "No token given!"}, 400)
-    
+          
         #Validates token
         if not check_token(token):
             return ({"errorDesc": "Invalid token!"}, 400)
@@ -95,14 +74,22 @@ def validate_request(domain, name_servers, token, captcha):
           
         if captcha == None or captcha == "":
             return  ({"errorDesc": "reCaptcha not checked"}, 400)
-    
+          
         valid_captcha = verify_captcha(captcha)
-        
         if not valid_captcha[0]:
             print(valid_captcha[1])
             return  ({"errorDesc": "reCaptcha verification failed"}, 400)
-
-    return True
+          
+    # If the user entered a non valid hostname, stop and don't run the other tests
+    if not checks.valid_hostname.run(domain, name_servers).get("result"):
+       return ({"errorDesc": "Wrong hostname format"}, 400)
+      
+    if delegation == True:
+        name_servers = get_nameservers(domain)
+    if domain == "" or domain == None or name_servers == [] or name_servers == None or name_servers == [None]:
+        return ({"errorDesc": "One of the fields is empty!"}, 400)
+      
+    return helpers.return_results(domain,name_servers,[])
 
 # Check if token given by client is valid
 def check_token(token):
@@ -117,8 +104,6 @@ def check_token(token):
     return False
 
 def check_time_limit(token):
-
-    #init a client instance for redis
     r = redis.Redis(**CONN_PARAMS())
 
     time = r.hget("token_hash", token)
@@ -133,7 +118,7 @@ def check_time_limit(token):
         return False
     
     else:
-        #lazy update the set
+        # lazy update the set
         r.hdel("token_hash", token)
         
         r.hset("token_hash", token, datetime.now().strftime("%d-%b-%Y (%H:%M:%S.%f)"))
@@ -173,3 +158,4 @@ def get_nameservers(domain):
     for i in nameservers.response.answer[0]:
         results.append(i.to_text())
     return results
+  
