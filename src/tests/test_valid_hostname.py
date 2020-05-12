@@ -18,3 +18,12 @@ class Test(TestCase):
         res = run("thisshouldfail.com", ["ns1.thisshouldfail.com", "ns2.thisshouldfail-.com"])
         assert not res["result"]
 
+    # This should fail as there are no TLD given for domain, and no subdomain/TLD for nameservers
+    def test_run_4(self):
+        res = run("thisiswrong", ["thisisnotcorrect", "fail.com"])
+        assert not res["result"]
+        
+    # This should pass as there are no illegal characters and both domain and nameservers have the needed number of parts (subdomain, TLD)
+    def test_run_5(self):
+        res = run("cccc.aaa", ["aaa.bbb.ccc", "ddd.eee.fff"])
+        assert res["result"]
