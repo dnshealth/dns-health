@@ -12,13 +12,13 @@ def ADDITIONAL_CHECKS():
 def get_details(result, id):
     return {"id" : id, "result" : result.get("result"), "description" : result.get("description"), "details" : result.get("details")}
 
-def important_checks(domain,name_servers,result_list):
+def important_checks(domain,name_servers,result_list, ipv6):
 
     id = 0
 
     for check in IMPORTANT_CHECKS():
         
-        result = check.run(domain,name_servers)
+        result = check.run(domain,name_servers,ipv6)
         
         result_list.append(get_details(result,id))
 
@@ -27,27 +27,27 @@ def important_checks(domain,name_servers,result_list):
         if not result.get("result"):
             break
 
-def additional_checks(domain,name_servers,result_list):
+def additional_checks(domain,name_servers,result_list,ipv6):
 
     #find the correct id since the list might grow up over time
     id = len(IMPORTANT_CHECKS()) + 1
 
     for check in ADDITIONAL_CHECKS():
 
-        result = check.run(domain,name_servers)
+        result = check.run(domain,name_servers,ipv6)
 
         result_list.append(get_details(result,id))
 
         id = id +1
 
-def return_results(domain,name_servers,result_list):
+def return_results(domain,name_servers,result_list,ipv6 ):
 
-    important_checks(domain,name_servers,result_list)
+    important_checks(domain,name_servers,result_list,ipv6)
 
     if len(result_list)!=len(IMPORTANT_CHECKS()):
         
         return ({"domain": domain, "ns": name_servers, "checks": result_list}, 200)
 
-    additional_checks(domain,name_servers,result_list)
+    additional_checks(domain,name_servers,result_list,ipv6)
 
     return ({"domain": domain, "ns": name_servers, "checks": result_list}, 200)

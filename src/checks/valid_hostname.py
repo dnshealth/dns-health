@@ -5,8 +5,7 @@
 # Returns True if hostname is valid
 import re
 
-
-def run(hostname, list_of_NS):
+def run(hostname, list_of_NS,ipv6):
     description = "Valid hostnames"
 
     # Check if hostname correct length

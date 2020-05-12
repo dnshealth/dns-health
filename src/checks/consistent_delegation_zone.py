@@ -3,12 +3,13 @@
 # Takes hostname and list of nameservers as input
 # Returns False if delegation and zone are not consistent
 # Returns True if delegation and zone are consistent
-import socket
 import dns.resolver
+import check_helpers as helpers
 
+def DESCRIPTION():
+    return "Consistency between delegation and zone"
 
-def run(hostname, list_of_NS):
-    description = "Consistency between delegation and zone"
+def run(hostname, list_of_NS,ipv6):
     listNSIP = []
     list_of_lists = []
     # Dns resolver initialization
@@ -17,9 +18,9 @@ def run(hostname, list_of_NS):
     # Getting nameserver IPs
     try:
         for x in list_of_NS:
-            listNSIP.append(socket.gethostbyname(x))
-    except socket.gaierror as err:
-        return {"description": description, "result": False, "details": str(err) + f": could not resolve IP of nameserver {x}"}
+            listNSIP.append(helpers.getTheIPofAServer(x, ipv6, DESCRIPTION()))
+    except Exception as err:
+        return {"description": DESCRIPTION(), "result": False, "details": str(err) + f": could not resolve IP of nameserver {x}"}
 
     try:
         # For every nameserver IP redefine the resolvers name server and query the hostname from that nameserver
@@ -39,10 +40,10 @@ def run(hostname, list_of_NS):
 
     # If query is refused return false
     except dns.resolver.NoNameservers:
-        return {"description": description, "result": False, "details": f"nameserver {name} query was refused"}
+        return {"description": DESCRIPTION(), "result": False, "details": f"nameserver {name} query was refused"}
 
     # Checking if all nameservers from all queries match the input list of nameservers
     if not all(x == sorted(list_of_NS) for x in list_of_lists):
-        return {"description": description, "result": False, "details": "Delegation is not consistent with nameserver records"}
+        return {"description": DESCRIPTION(), "result": False, "details": "Delegation is not consistent with nameserver records"}
     else:
-        return {"description": description, "result": True, "details": "Delegation is consistent with nameserver records"}
+        return {"description": DESCRIPTION(), "result": True, "details": "Delegation is consistent with nameserver records"}

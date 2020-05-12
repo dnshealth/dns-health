@@ -4,35 +4,16 @@
 # Returns False if query fails or nameserver IP can not be resolved
 # Returns False if NS records or SOA records are not consistent
 # Returns True if NS records and SOA records are consistent; contain the same information
-import socket
 import dns.resolver
+import check_helpers as helpers
 
+def DESCRIPTION():
+    return "Consistency between authoritative nameservers"
 
-def run(hostname, list_of_NS):
-    # Filter out duplicate nameserver entries
-    list_of_NS = set(list_of_NS)
-    description = "Consistency between authoritative nameservers"
-
-    # Consistent function return tuple with result: True/False and details
-    ns_check = consistent(hostname, list_of_NS, 'NS')
+def consistent(hostname, list_of_NS, qtype,ipv6):
     
-    # Check if nameserver NS records are consistent if not return False
-    if not ns_check[0]:
-        return {"description": description, "result": False, "details": ns_check[1]}
-    else:
-        pass
-
-    # Check if nameserver SOA records are consistent if not return False
-    soa_check = consistent(hostname, list_of_NS, 'SOA')
-    
-    if not soa_check[0]:
-        return {"description": description, "result": False, "details": soa_check[1]}
-    else:
-        return {"description": description, "result": True, "details": soa_check[1]}
-
-
-def consistent(hostname, list_of_NS, qtype):
     listNSIP = []
+    
     list_of_lists = []
     # Dns resolver initialization
     resolver = dns.resolver.Resolver()
@@ -40,8 +21,8 @@ def consistent(hostname, list_of_NS, qtype):
     # Getting nameserver IPs
     try:
         for x in list_of_NS:
-            listNSIP.append(socket.gethostbyname(x))
-    except socket.gaierror as err:
+            listNSIP.append(helpers.getTheIPofAServer(x,ipv6,DESCRIPTION()))
+    except Exception as err:
         return (False, str(err) + f": could not resolve IP of nameserver {x}")
 
     try:
@@ -65,7 +46,7 @@ def consistent(hostname, list_of_NS, qtype):
             list_of_lists.append(sorted(temp))
 
     # If query is refused return false
-    except dns.resolver.NoNameservers as err:
+    except Exception as err:
         return (False, str(err) + f": nameserver {name} query was refused")
 
     # Check if first query is equal to all other queries as they need to be the same
@@ -73,3 +54,24 @@ def consistent(hostname, list_of_NS, qtype):
         return (False, "Inconsistent NS or SOA records")
     else:
         return (True, "Consistent NS and SOA records")
+
+def run(hostname, list_of_NS,ipv6):
+    # Filter out duplicate nameserver entries
+    list_of_NS = set(list_of_NS)
+
+    # Consistent function return tuple with result: True/False and details
+    ns_check = consistent(hostname, list_of_NS, 'NS',ipv6)
+    
+    # Check if nameserver NS records are consistent if not return False
+    if not ns_check[0]:
+        return {"description": DESCRIPTION(), "result": False, "details": ns_check[1]}
+    else:
+        pass
+
+    # Check if nameserver SOA records are consistent if not return False
+    soa_check = consistent(hostname, list_of_NS, 'SOA',ipv6)
+    
+    if not soa_check[0]:
+        return {"description": DESCRIPTION(), "result": False, "details": soa_check[1]}
+    else:
+        return {"description": DESCRIPTION(), "result": True, "details": soa_check[1]}
