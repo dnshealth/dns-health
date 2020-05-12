@@ -26,8 +26,6 @@ domain = args.domain
 ns = args.ns
 ipv6 = args.ipv6=='true'
 
-print(ipv6)
-
 # Now, we can start to run the checks. We define a list to which we append the results from each check.
 results = helpers.return_results(domain,ns,[],ipv6)
 

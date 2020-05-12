@@ -3,7 +3,7 @@
 #DNSHEALTH-12
 import dns.resolver
 from dns.exception import DNSException
-import check_helpers as helpers
+import checks.check_helpers as helpers
 
 def DESCRIPTION():
     return "Checking for authoritative answers"
@@ -21,8 +21,6 @@ def getAuthServers(domain, name_servers,ipv6):
 
             var = dns.message.make_query(domain,dns.rdatatype.SOA)
 
-            print(type(helpers.getTheIPofAServer(server,ipv6,DESCRIPTION())["result"]))
-
             response = dns.query.udp(var, helpers.getTheIPofAServer(server,ipv6,DESCRIPTION())["result"])
         
         except DNSException as e:
@@ -38,6 +36,3 @@ def getAuthServers(domain, name_servers,ipv6):
 
 def run(domain, list_of_name_servers,ipv6):
     return getAuthServers(domain,list_of_name_servers,ipv6)
-
-
-print(run("kth.se",["a.ns.kth.se","b.ns.kth.se"],True))

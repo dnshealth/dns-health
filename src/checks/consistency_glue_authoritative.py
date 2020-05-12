@@ -95,5 +95,3 @@ def getGlueRecords(domain, list_of_name_servers,ipv6):
 
 def run(domain, list_of_name_servers,ipv6):
     return getGlueRecords(domain,list_of_name_servers,ipv6)
-
-print(run("kth.se",["a.ns.kth.se", "b.ns.kth.se"],True))
