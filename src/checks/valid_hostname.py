@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python3
 # Program checks if given hostname is valid
 # Takes hostname and list of nameservers as input
 # Returns False if hostname is not valid
