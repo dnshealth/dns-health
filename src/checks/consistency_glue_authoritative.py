@@ -3,7 +3,7 @@
 #DNSHEALTH-14
 import dns, dns.resolver, dns.query, dns.name
 from dns.exception import DNSException
-import check_helpers as helpers
+import checks.check_helpers as helpers
 
 def DESCRIPTION():
     return "Check glue consistency"
@@ -19,7 +19,6 @@ def getGlueRecords(domain, list_of_name_servers,ipv6):
         
         (_, response_from_the_servers) = helpers.ask_servers(helpers.ROOT_SERVERS(),query)
 
-
         try:
             answer = response_from_the_servers.additional
 
@@ -33,10 +32,22 @@ def getGlueRecords(domain, list_of_name_servers,ipv6):
 
         additional_section = response_from_the_servers.additional
 
+        correct_servers = []
+
+        if ipv6:
+            for tempo in additional_section:
+                if ' IN AAAA ' in tempo.to_text():
+                    correct_servers.append(tempo)
+        else:
+            for tempo in additional_section:
+                if ' IN A ' in tempo.to_text():
+                    correct_servers.append(tempo)
+        
+
         results = {}
 
         #build the dictionary based on the additional section of the response we got the server
-        for entry in additional_section:
+        for entry in correct_servers:
 
             name_of_the_server = entry.name.to_text().strip(".")
             
@@ -63,7 +74,7 @@ def getGlueRecords(domain, list_of_name_servers,ipv6):
             if ip["result"] == False:
                 return ip
 
-            ip_reponse_of_the_name_server = dns.query.udp(ip_query,helpers.getTheIPofAServer(i,ipv6,DESCRIPTION())["result"])
+            ip_reponse_of_the_name_server = dns.query.udp(ip_query,ip["result"])
 
             ip_answer_of_the_name_server = ip_reponse_of_the_name_server.answer
             
@@ -84,3 +95,5 @@ def getGlueRecords(domain, list_of_name_servers,ipv6):
 
 def run(domain, list_of_name_servers,ipv6):
     return getGlueRecords(domain,list_of_name_servers,ipv6)
+
+print(run("kth.se",["a.ns.kth.se", "b.ns.kth.se"],True))

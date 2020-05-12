@@ -4,7 +4,7 @@ import dns.name
 import dns.message
 import dns.query
 import dns.exception
-import check_helpers as helpers
+import checks.check_helpers as helpers
 
 def DESCRIPTION():
     return "No truncation of referrals"

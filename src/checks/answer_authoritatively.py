@@ -21,6 +21,8 @@ def getAuthServers(domain, name_servers,ipv6):
 
             var = dns.message.make_query(domain,dns.rdatatype.SOA)
 
+            print(type(helpers.getTheIPofAServer(server,ipv6,DESCRIPTION())["result"]))
+
             response = dns.query.udp(var, helpers.getTheIPofAServer(server,ipv6,DESCRIPTION())["result"])
         
         except DNSException as e:
@@ -36,3 +38,6 @@ def getAuthServers(domain, name_servers,ipv6):
 
 def run(domain, list_of_name_servers,ipv6):
     return getAuthServers(domain,list_of_name_servers,ipv6)
+
+
+print(run("kth.se",["a.ns.kth.se","b.ns.kth.se"],True))
