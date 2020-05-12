@@ -147,7 +147,7 @@ def getGlueRecords(domain, list_of_name_servers, ipv6_enabled):
             
             try:
 
-                ip = getTheIPofAServer(i, ipv6_enabled)
+                ip = getTheIPofAServer(i, False)
             
             except  dns.resolver.NXDOMAIN as e:
                 

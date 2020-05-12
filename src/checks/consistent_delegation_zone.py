@@ -37,22 +37,26 @@ def run(hostname, list_of_NS, ipv6_enabled):
     resolver = dns.resolver.Resolver()
 
     # Getting nameserver IPs
-    try:
-        for x in list_of_NS:
-            listNSIP.append(getTheIPofAServer(x, ipv6_enabled))
-    except socket.gaierror as err:
-        return {"description": description, "result": False, "details": str(err) + f": could not resolve IP of nameserver {x}"}
+    
+    for x in list_of_NS:
+        listNSIP.append(getTheIPofAServer(x, False)["result"])
+    
 
     try:
         # For every nameserver IP redefine the resolvers name server and query the hostname from that nameserver
         for name in listNSIP:
+            
             resolver.nameservers = [name]
             temp = []
+            
             try:
+                
                 for data in resolver.query(hostname, 'NS'):
+                    
                     # Appending query results to a temporary list and removing end dot
                     temp.append(data.to_text()[:-1])
             except dns.resolver.NoAnswer:
+                
                 # If we got no answer from an NS, we could just claim it has no NS records. So temp will remain empty.
                 pass
 

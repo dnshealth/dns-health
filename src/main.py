@@ -11,10 +11,11 @@ parser = argparse.ArgumentParser()
 
 # We define the parameters that the user should input.
 parser.add_argument('--domain', help="The domain to check on NS servers")
+# add argument to enable ipv6
+parser.add_argument('--ipv6', help ="Enables ipv6")
 # The user can enter a list of nameservers with the --ns param
 parser.add_argument('--ns', type=str, nargs='+', help="A list of NS servers to check.")
-# add argument to enable ipv6
-parser.add_argument('--ipv6', type = bool, help ="Enables ipv6")
+
 parser.add_argument('--json', help="Output results from checks as JSON", action='count', default=0)
 
 # We parse the arguments
@@ -26,7 +27,9 @@ args = parser.parse_args()
 # args.ipv6 should give a boolean for if ipv6 should be enabled
 domain = args.domain
 ns = args.ns
-ipv6 = args.ipv6
+ipv6 = args.ipv6 == "true"
+
+
 
 # Now, we can start to run the checks. We define a list to which we append the results from each check.
 checks = [checks.minimal_ns, checks.valid_hostname, checks.nameserver_reachability, checks.answer_authoritatively, checks.network_diversity, checks.consistency_glue_authoritative, checks.consistent_delegation_zone, checks.consistent_authoritative_nameservers, checks.truncref, checks.prohibited_networks, checks.dns_test_recursion, checks.same_source_address]
@@ -34,12 +37,15 @@ results = []
 
 # Run each check and append result to results.
 for check in checks:
+    
     result = check.run(domain,ns, ipv6)
+    
     # Check if the check returns a boolean or a more advanced dict consisting of a description too.
     if isinstance(result, bool):
         result = {"result": result, "description": str(check.__name__)}
+    
     results.append(result)
-
+    
     # If the check failed, we shall exit the for loop and stop testing.
 #    if not result["result"]:
 #        break
