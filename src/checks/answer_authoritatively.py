@@ -5,10 +5,21 @@ import dns.resolver
 from dns.exception import DNSException
 
 def getTheIPofAServer(nameOfTheServer):
-    
-    temp  = dns.resolver.Resolver().query(nameOfTheServer,'A')
+   
+    try:
 
-    return temp.response.answer[0][0].to_text()
+        temp  = dns.resolver.Resolver().query(nameOfTheServer,'A')
+
+    except Exception as e:
+
+        return {"result": False, "description": "Checking for authoritative answers" ,"details": e.msg}
+
+    answer = temp.response.answer[0][0].to_text()
+
+    if answer is not None:
+        return {"result": answer, "description": "Checking for authoritative answers", "details": "Successfully found the IP!"}
+    else:
+        return {"result": False, "description": "Checking for authoritative answers" ,"details": "No A records for {0} server were found!".format(nameOfTheServer)}
 
 def getAuthServers(domain, name_servers):
 
@@ -18,22 +29,33 @@ def getAuthServers(domain, name_servers):
 
         try:
 
-            var      = dns.message.make_query(domain,dns.rdatatype.SOA)
+            ip = getTheIPofAServer(server)
+            
+        except Exception as e:
+                
+            return {"result": False, "description" : "Checking for authoritative answers" ,"details": e.msg }
 
-            response = dns.query.udp(var, getTheIPofAServer(server))
+        if ip["result"] == False :
+            
+            return ip
+
+        try:
+
+            var = dns.message.make_query(domain,dns.rdatatype.SOA)
+
+            response = dns.query.udp(var, getTheIPofAServer(server)["result"])
         
-        except DNSException:
-            return False
+        except DNSException as e:
+            
+            return {"result": -1,"description" : "Checking for authoritative answers", "details": e.msg}
 
         answer   = response.answer
 
         if len(answer) == 0:
-            return False
+            return {"result": False ,"description": "Checking for authoritative answers", "details": "Resolved 0 authoritative servers"}
 
-    return True
+    return {"result": True,"description": "Checking for authoritative answers" ,"details": "Successfully validated authoritative answers"}
 
 
 def run(domain, list_of_name_servers):
-    answer = getAuthServers(domain,list_of_name_servers)
-
-    return {'description':"answer authoritatively", 'result': answer}
+    return getAuthServers(domain,list_of_name_servers)

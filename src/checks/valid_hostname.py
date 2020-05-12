@@ -16,7 +16,15 @@ def run(hostname, list_of_NS):
     if hostname[-1] == ".":
         # strip end dot, if present
         hostname = hostname[:-1]
+        
 
+
+    #strip end dots from nameservers
+    for i in range(len(list_of_NS)):
+        if list_of_NS[i][-1] == ".":
+            list_of_NS[i] = list_of_NS[i][:-1]
+
+    print(list_of_NS)
     # regex to check for invalid simbols
     allowed = re.compile("(?!-)[A-Z\d-]{1,63}(?<!-)$", re.IGNORECASE)
     # Return True if all parts of hostname are valid
