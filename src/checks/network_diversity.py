@@ -15,13 +15,18 @@ def run(hostname, list_of_NS):
 
     try:
         for x in list_of_NS:
-            # Getting IPs of nameservers
+            # Get IP of nameserver
             net = Net(socket.gethostbyname(x))
+            
+            # Get ASN information object for IP address
             obj = IPASN(net)
-            # Getting dictionary with AS info for specific IP
+            
+            # Get dictionary with AS info for the object
             results = obj.lookup()
+            
             # Extracts only ASN from dictionary and adds them to a list
             listASN.append(results.get('asn'))
+    # Catch error if IP of a nameserver could not be resloved
     except socket.gaierror as err:
         return {"description": description, "result": False, "details": str(err) + f": could not resolve IP of nameserver {x}"}
 
