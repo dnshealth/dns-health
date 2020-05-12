@@ -54,5 +54,3 @@ def run(hostname, list_of_NS):
     
     else:
         return {"description": description, "result": False, "details": "Hostname and nameservers are invalid"}
-    
-print(run("aaa.aaa", ["aa.aaa.aaa"]))
