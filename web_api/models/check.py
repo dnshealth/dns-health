@@ -51,7 +51,7 @@ class Check(Model):
         self._token = token
         self._recaptcha_response = recaptcha_response
         self._delegation = delegation
-        self._ipv6 = _ipv6
+        self._ipv6 = ipv6
 
 
     @classmethod
