@@ -3,7 +3,9 @@
 #DNSHEALTH-14
 import dns, dns.resolver, dns.query, dns.name
 from dns.exception import DNSException
-import src.checks.check_helpers as helpers
+#import src.checks.check_helpers as helpers
+
+import check_helpers as helpers
 
 def DESCRIPTION():
     return "Check glue consistency"
@@ -45,8 +47,6 @@ def getGlueRecords(domain, list_of_name_servers,ipv6):
             for tempo in additional_section:
                 if ' IN A ' in tempo.to_text():
                     correct_servers.append(tempo)
-        
-
         results = {}
 
         #build the dictionary based on the additional section of the response we got the server
@@ -72,7 +72,7 @@ def getGlueRecords(domain, list_of_name_servers,ipv6):
             else:
                 ip_query = dns.message.make_query(i,dns.rdatatype.A)
             
-            ip = helpers.getTheIPofAServer(server,ipv6,DESCRIPTION())
+            ip = helpers.getTheIPofAServer(i,ipv6,DESCRIPTION())
             
             if ip["result"] == False:
                 return ip
@@ -87,7 +87,7 @@ def getGlueRecords(domain, list_of_name_servers,ipv6):
             for ip["result"] in ip_answer_of_the_name_server:
                 if i in results:
                     if ip["result"][0].to_text() not in results[i]:
-                        return {"result": False,"description":DESCRIPTION(), "details": "{0} could not be found in the glue records for ipv4 addresses".format(ip["result"][0].to_text())}
+                        return {"result": False,"description":DESCRIPTION(), "details": "{0} could not be found in the glue records for ip addresses".format(ip["result"][0].to_text())}
 
                     results[i].remove(ip["result"][0].to_text())
 
@@ -98,3 +98,5 @@ def getGlueRecords(domain, list_of_name_servers,ipv6):
 
 def run(domain, list_of_name_servers,ipv6):
     return getGlueRecords(domain,list_of_name_servers,ipv6)
+
+print(run("google.com",["ns1.google.com","ns2.google.com","ns3.google.com"],False))
