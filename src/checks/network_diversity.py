@@ -6,6 +6,7 @@
 from ipwhois.net import Net
 from ipwhois.asn import IPASN
 import socket
+from ipwhois.exceptions import IPDefinedError
 
 
 
@@ -15,20 +16,15 @@ def run(hostname, list_of_NS):
 
     try:
         for x in list_of_NS:
-            # Get IP of nameserver
+            # Getting IPs of nameservers
             net = Net(socket.gethostbyname(x))
-            
-            # Get ASN information object for IP address
             obj = IPASN(net)
-            
-            # Get dictionary with AS info for the object
+            # Getting dictionary with AS info for specific IP
             results = obj.lookup()
-            
             # Extracts only ASN from dictionary and adds them to a list
             listASN.append(results.get('asn'))
-    # Catch error if IP of a nameserver could not be resloved
-    except socket.gaierror as err:
-        return {"description": description, "result": False, "details": str(err) + f": could not resolve IP of nameserver {x}"}
+    except (socket.gaierror, IPDefinedError) as err:
+        return {"description": description, "result": False, "details": str(err) + f": Error resolving IP of nameserver {x}"}
 
     # Checks if nameservers ar located in at least 2 different Autonomous Systems
     if  len(set(listASN)) < 2:
