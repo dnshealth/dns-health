@@ -3,7 +3,7 @@
 #DNSHEALTH-12
 import dns.resolver
 from dns.exception import DNSException
-import check_helpers as helpers
+import checks.check_helpers as helpers
 
 def DESCRIPTION():
     return "Checking for authoritative answers"

@@ -1,6 +1,6 @@
 import dns.message
 import dns.query
-import check_helpers as helpers
+import checks.check_helpers as helpers
 
 def DESCRIPTION():
     return "Check whether nameservers are recursive or not"

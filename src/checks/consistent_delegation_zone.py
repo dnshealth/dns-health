@@ -4,7 +4,7 @@
 # Returns False if delegation and zone are not consistent
 # Returns True if delegation and zone are consistent
 import dns.resolver
-import check_helpers as helpers
+import checks.check_helpers as helpers
 
 def DESCRIPTION():
     return "Consistency between delegation and zone"
@@ -18,7 +18,7 @@ def run(hostname, list_of_NS,ipv6):
     # Getting nameserver IPs
     try:
         for x in list_of_NS:
-            listNSIP.append(helpers.getTheIPofAServer(x, ipv6, DESCRIPTION()))
+            listNSIP.append(helpers.getTheIPofAServer(x, ipv6, DESCRIPTION())["result"])
     except Exception as err:
         return {"description": DESCRIPTION(), "result": False, "details": str(err) + f": could not resolve IP of nameserver {x}"}
 

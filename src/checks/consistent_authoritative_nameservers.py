@@ -5,7 +5,7 @@
 # Returns False if NS records or SOA records are not consistent
 # Returns True if NS records and SOA records are consistent; contain the same information
 import dns.resolver
-import check_helpers as helpers
+import checks.check_helpers as helpers
 
 def DESCRIPTION():
     return "Consistency between authoritative nameservers"

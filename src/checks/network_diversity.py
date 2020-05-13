@@ -5,7 +5,7 @@
 # Returns True id all ASN of nameservers are unique
 from ipwhois.net import Net
 from ipwhois.asn import IPASN
-import check_helpers as helpers
+import checks.check_helpers as helpers
 
 def DESCRIPTION():
     return "Network diversity"
@@ -18,7 +18,7 @@ def run(hostname, list_of_NS,ipv6):
     try: 
         for x in list_of_NS:
             # Getting IPs of nameservers
-            net = Net(helpers.getTheIPofAServer(x,ipv6,DESCRIPTION()))
+            net = Net(helpers.getTheIPofAServer(x,ipv6,DESCRIPTION())["result"])
             obj = IPASN(net)
             # Getting dictionary with AS info for specific IP
             results = obj.lookup()

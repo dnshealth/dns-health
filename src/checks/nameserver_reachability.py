@@ -3,7 +3,7 @@
 import dns.resolver
 import sys
 from dns.exception import DNSException
-import check_helpers as helpers
+import checks.check_helpers as helpers
 
 def DESCRIPTION():
     return "Checking of nameserver reachability"
@@ -50,7 +50,7 @@ def getReachableNameServers(domain, nameServers,ipv6):
 
         #try sending a udp packet to see if it's listening on UDP
         udpPacket = dns.query.udp(query,ip["result"])
-
+     
         #try sending a tcp packet to see if it's listening on TCP
         tcpPacket = dns.query.tcp(query,ip["result"])
 
