@@ -5,7 +5,7 @@
 # Returns True id all ASN of nameservers are unique
 from ipwhois.net import Net
 from ipwhois.asn import IPASN
-import checks.check_helpers as helpers
+import src.checks.check_helpers as helpers
 
 def DESCRIPTION():
     return "Network diversity"

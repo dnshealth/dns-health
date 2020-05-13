@@ -4,7 +4,7 @@
 # Returns False if delegation and zone are not consistent
 # Returns True if delegation and zone are consistent
 import dns.resolver
-import checks.check_helpers as helpers
+import src.checks.check_helpers as helpers
 
 def DESCRIPTION():
     return "Consistency between delegation and zone"

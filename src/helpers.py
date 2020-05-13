@@ -1,4 +1,4 @@
-import checks as checks
+import src.checks as checks
 
 def IMPORTANT_CHECKS():
     return [checks.valid_hostname,checks.prohibited_networks,checks.nameserver_reachability,

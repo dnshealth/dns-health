@@ -3,7 +3,7 @@
 #DNSHEALTH-12
 import dns.resolver
 from dns.exception import DNSException
-import checks.check_helpers as helpers
+import src.checks.check_helpers as helpers
 
 def DESCRIPTION():
     return "Checking for authoritative answers"
@@ -22,6 +22,7 @@ def answer_authoritatively(domain, name_servers,ipv6):
             var = dns.message.make_query(domain,dns.rdatatype.SOA)
 
             response = dns.query.udp(var, ip["result"])
+            
         
         except DNSException as e:
             

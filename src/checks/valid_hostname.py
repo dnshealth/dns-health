@@ -23,7 +23,7 @@ def run(hostname, list_of_NS,ipv6):
         if list_of_NS[i][-1] == ".":
             list_of_NS[i] = list_of_NS[i][:-1]
 
-    print(list_of_NS)
+    # print(list_of_NS)
     # regex to check for invalid simbols
     allowed = re.compile("(?!-)[A-Z\d-]{1,63}(?<!-)$", re.IGNORECASE)
     # Return True if all parts of hostname are valid

@@ -1,4 +1,4 @@
-import checks.check_helpers as helpers
+import src.checks.check_helpers as helpers
 
 def DESCRIPTION():
     return "Unique Nameservers"
