@@ -17,28 +17,34 @@ def run(hostname, list_of_NS):
     # Get a list of records from all nameservers
     ns_check = consistent(hostname, list_of_NS, description, 'NS')
     
+    # Check if record extraction function returned an error, if so return the error
     if not isinstance(ns_check, list):
         return ns_check
     
+    # Compare the records with eachother to see if they are consistent
     ns_res = recordcheck(ns_check, list_of_NS, "NS")
     
-    # Check if nameserver NS records are consistent if not return False
+    # Extract answer from tuple
     if not ns_res[0]:
         return {"description": description, "result": False, "details": ns_res[1]}
     else:
         pass
 
-    # Check if nameserver SOA records are consistent if not return False
+    # Get a list of SOA records from all nameservers
     soa_check = consistent(hostname, list_of_NS, description, 'SOA')
     
+    # Check if record extraction function returned an error, if so return the error
     if not isinstance(soa_check, list):
         return soa_check
     
+    # Compare the records with eachother to see if they are consistent
     soa_res = recordcheck(soa_check, list_of_NS, "SOA")
+    
+    # Extract answer from tuple
     if not soa_res[0]:
         return {"description": description, "result": False, "details": soa_res[1]}
     else:
-        return {"description": description, "result": True, "details": soa_res[1]}
+        return {"description": description, "result": True, "details": "Both SOA and NS records are consistent"}
 
 
 def recordcheck(records, list_of_NS, flag):
