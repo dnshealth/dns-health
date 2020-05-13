@@ -13,9 +13,12 @@ def getGlueRecords(domain, list_of_name_servers,ipv6):
     #ietrate over the list of name servers given so we can test them again the actual ip's and server names
     for server in list_of_name_servers:
 
-        server.split(".")
+        query = None
 
-        query = dns.message.make_query(server, dns.rdatatype.A)
+        if ipv6:
+            query = dns.message.make_query(server, dns.rdatatype.AAAA)
+        else:
+            query = dns.message.make_query(server, dns.rdatatype.A)
         
         (_, response_from_the_servers) = helpers.ask_servers(helpers.ROOT_SERVERS(),query)
 
