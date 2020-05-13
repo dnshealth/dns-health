@@ -4,14 +4,24 @@
 # Returns False if hostname is not valid
 # Returns True if hostname is valid
 import re
+import socket
 
 
 def run(hostname, list_of_NS):
     description = "Valid hostname"
+    
+    # Check if IP was given instead of domain name(hostname contains only numbers)
+    if not re.match(r"[a-zA-Z]+", hostname):
+        return {"description": description, "result": False, "details": "IP given insted of domain name"}
 
+    # Check if any of the given nameservers is an IP address insted of the domain name for said nameserver
+    for nameserver in list_of_NS:
+        if not re.match(r"[a-zA-Z]+", nameserver):
+            return {"description": description, "result": False, "details": "IP given insted of nameserver"}
+        
     # Check if hostname correct length
     if len(hostname) > 255:
-        return {"description": description, "result": False}
+        return {"description": description, "result": False, "details": "Hostname too long"}
     
     # Strip end dot, if present
     if hostname[-1] == ".":    
