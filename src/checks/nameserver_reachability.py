@@ -3,7 +3,7 @@
 import dns.resolver
 import sys
 from dns.exception import DNSException
-import checks.check_helpers as helpers
+import src.checks.check_helpers as helpers
 
 def DESCRIPTION():
     return "Checking of nameserver reachability"

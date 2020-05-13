@@ -2,7 +2,7 @@
 
 # Example usage: ./main.py --domain dnshealth.eu --ns dns1.dnshealth.eu dns2.dnshealth.eu
 import argparse
-import helpers
+from . import helpers
 import dns.name
 import json
 from termcolor import colored
