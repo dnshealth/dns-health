@@ -8,7 +8,7 @@ import checks.check_helpers as helpers
 def DESCRIPTION():
     return "Checking for authoritative answers"
 
-def getAuthServers(domain, name_servers,ipv6):
+def answer_authoritatively(domain, name_servers,ipv6):
 
     for server in name_servers:
         
@@ -21,18 +21,16 @@ def getAuthServers(domain, name_servers,ipv6):
 
             var = dns.message.make_query(domain,dns.rdatatype.SOA)
 
-            response = dns.query.udp(var, helpers.getTheIPofAServer(server,ipv6,DESCRIPTION())["result"])
+            response = dns.query.udp(var, ip["result"])
         
         except DNSException as e:
             
-            return {"result": -1,"description" : DESCRIPTION(), "details": e.msg}
+            return {"result": False,"description" : DESCRIPTION(), "details": e.msg}
 
-        answer = response.answer
-
-        if len(answer) == 0:
+        if len(response.answer) == 0:
             return {"result": False ,"description": DESCRIPTION(), "details": "Resolved 0 authoritative servers"}
 
     return {"result": True,"description": DESCRIPTION() ,"details": "Successfully validated authoritative answers"}
 
 def run(domain, list_of_name_servers,ipv6):
-    return getAuthServers(domain,list_of_name_servers,ipv6)
+    return answer_authoritatively(domain,list_of_name_servers,ipv6)
