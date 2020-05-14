@@ -123,9 +123,12 @@ def consistent(hostname, list_of_NS, description, flag, ipv6):
     # Getting nameserver IPs
     try:
         for x in list_of_NS:
-            listNSIP.append(getTheIPofAServer(x,ipv6,description))
+            ip_address = getTheIPofAServer(x,ipv6,description)["result"]
+            if not getTheIPofAServer(x,ipv6,description)["result"]:
+                return getTheIPofAServer(x,ipv6,description)
+            listNSIP.append(ip_address)
     except Exception as err:
-        return (False, str(err) + f": could not resolve IP of nameserver {x}")
+        return {"description": description, "result": False, "details": str(err) + f": could not resolve IP of nameserver {x}"}
 
     try:
         # For every nameserver IP redefine the resolvers name server and query the hostname from that nameserver

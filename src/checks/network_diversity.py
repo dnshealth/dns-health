@@ -17,8 +17,11 @@ def run(hostname, list_of_NS, ipv6):
 
     try: 
         for x in list_of_NS:
+            ip_address = helpers.getTheIPofAServer(x,ipv6,DESCRIPTION())["result"]
+            if isinstance(helpers.getTheIPofAServer(x,ipv6,DESCRIPTION())["result"], bool):
+                return helpers.getTheIPofAServer(x,ipv6,DESCRIPTION())
             # Getting IPs of nameservers
-            net = Net(helpers.getTheIPofAServer(x,ipv6,DESCRIPTION())["result"])
+            net = Net(ip_address)
             obj = IPASN(net)
             # Getting dictionary with AS info for specific IP
             results = obj.lookup()
