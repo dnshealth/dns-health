@@ -27,7 +27,6 @@ def run(domain, ns_list,ipv6):
 
 def prohibited_check(ns_server, ipv6):
     if ipv6:
-        deprecated_ips = ipaddress.ip_address('2002::/16')
         try:
             result = dns.resolver.query(ns_server, 'AAAA')
         except:
