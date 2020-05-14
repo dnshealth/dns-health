@@ -10,15 +10,18 @@ import src.checks.check_helpers as helpers
 def DESCRIPTION():
     return "Network diversity"
 
-
-def run(hostname, list_of_NS,ipv6):
-
+# Takes "hostname" string, "list_of_NS" list of string
+# Returns dictionary with "description" key string value, "results" key boolean value, "details" key string value
+def run(hostname, list_of_NS, ipv6):
     listASN = []
 
     try: 
         for x in list_of_NS:
+            ip_address = helpers.getTheIPofAServer(x,ipv6,DESCRIPTION())["result"]
+            if isinstance(helpers.getTheIPofAServer(x,ipv6,DESCRIPTION())["result"], bool):
+                return helpers.getTheIPofAServer(x,ipv6,DESCRIPTION())
             # Getting IPs of nameservers
-            net = Net(helpers.getTheIPofAServer(x,ipv6,DESCRIPTION())["result"])
+            net = Net(ip_address)
             obj = IPASN(net)
             # Getting dictionary with AS info for specific IP
             results = obj.lookup()
