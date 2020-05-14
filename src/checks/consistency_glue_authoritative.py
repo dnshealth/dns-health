@@ -5,7 +5,7 @@ import dns, dns.resolver, dns.query, dns.name
 from dns.exception import DNSException
 #import src.checks.check_helpers as helpers
 
-import check_helpers as helpers
+import src.checks.check_helpers as helpers
 
 def DESCRIPTION():
     return "Check glue consistency"
@@ -99,4 +99,3 @@ def getGlueRecords(domain, list_of_name_servers,ipv6):
 def run(domain, list_of_name_servers,ipv6):
     return getGlueRecords(domain,list_of_name_servers,ipv6)
 
-print(run("google.com",["ns1.google.com","ns2.google.com","ns3.google.com"],False))

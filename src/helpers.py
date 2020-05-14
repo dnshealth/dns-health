@@ -1,4 +1,6 @@
 import src.checks as checks
+import dns
+import socket
 
 def IMPORTANT_CHECKS():
     return [checks.valid_hostname,checks.prohibited_networks,checks.nameserver_reachability,
