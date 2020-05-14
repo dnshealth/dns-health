@@ -15,7 +15,7 @@ parser.add_argument('--domain', help="The domain to check on NS servers")
 parser.add_argument('--ns', type=str, nargs='+', help="A list of NS servers to check.")
 parser.add_argument('--json', help="Output results from checks as JSON", action='count', default=0)
 # add argument to enable ipv6
-parser.add_argument('--ipv6', help ="Enables ipv6")
+parser.add_argument('--ipv6', help ="Enables ipv6", default = 0, action="store_true")
 # We parse the arguments
 args = parser.parse_args()
 
@@ -24,7 +24,7 @@ args = parser.parse_args()
 # args.ns gives a list of NS servers.
 domain = args.domain
 ns = args.ns
-ipv6 = args.ipv6=='true'
+ipv6 = args.ipv6
 
 # Check if any of the input values are empty
 if domain == None or domain == "":

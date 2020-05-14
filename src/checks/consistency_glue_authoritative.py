@@ -3,8 +3,6 @@
 #DNSHEALTH-14
 import dns, dns.resolver, dns.query, dns.name
 from dns.exception import DNSException
-#import src.checks.check_helpers as helpers
-
 import src.checks.check_helpers as helpers
 
 def DESCRIPTION():
@@ -12,7 +10,7 @@ def DESCRIPTION():
 
 def getGlueRecords(domain, list_of_name_servers,ipv6):
 
-    #ietrate over the list of name servers given so we can test them again the actual ip's and server names
+    #iterate over the list of name servers given so we can test them again the actual ip's and server names
     for server in list_of_name_servers:
 
         query = None
@@ -94,7 +92,7 @@ def getGlueRecords(domain, list_of_name_servers,ipv6):
         for _,value in results.items():
             if len(value) != 0:
                 return {"result": False, "description": DESCRIPTION(), "details": "Extra addresses were found when queried the servers!({0})".format(value)}
-        return {"result": True,"description":DESCRIPTION(), "details": "Sucess! There is consistency between glue and authoritative data!"}
+        return {"result": True,"description":DESCRIPTION(), "details": "Success! There is consistency between glue and authoritative data!"}
 
 def run(domain, list_of_name_servers,ipv6):
     return getGlueRecords(domain,list_of_name_servers,ipv6)
