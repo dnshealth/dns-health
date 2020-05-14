@@ -8,8 +8,10 @@ from ipwhois.asn import IPASN
 import socket
 
 
-
+# Takes "hostname" string, "list_of_NS" list of string
+# Returns dictionary with "description" key string value, "results" key boolean value, "details" key string value
 def run(hostname, list_of_NS):
+    # Define description of check
     description = "Network diversity"
     listASN = []
 

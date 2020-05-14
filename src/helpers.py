@@ -56,6 +56,9 @@ def return_results(domain,name_servers,result_list):
 
 
 # Function used by consistenctency checks
+# Takes "hostname" string, "list_of_NS" list of string, "description" string, "flag" string
+# Returns a list of lists of string with nameserver records specified by "flag" (NS, SOA, etc.)
+# If error Returns dictionary with "description" key string value, "results" key boolean value, "details" key string value
 def consistent(hostname, list_of_NS, description, flag):
     listNSIP = []
     list_of_lists = []
@@ -88,7 +91,7 @@ def consistent(hostname, list_of_NS, description, flag):
             # Combining list of results from each query in to list of lists
             list_of_lists.append(sorted(temp))
             
-            
+    # Throw exception if nameserver query was refused
     except dns.resolver.NoNameservers:
         return {"description": description, "result": False, "details": f"nameserver {name} query was refused"}  
 

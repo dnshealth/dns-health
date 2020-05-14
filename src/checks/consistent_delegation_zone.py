@@ -7,7 +7,10 @@ import socket
 import dns.resolver
 from src.helpers import consistent
 
+# Takes "hostname" string, "list_of_NS" list of string
+# Returns dictionary with "description" key string value, "results" key boolean value, "details" key string value
 def run(hostname, list_of_NS):
+    # Define description of check
     description = "Consistency between delegation and zone"
     
     # Get a list of nameserver records from each namserver
@@ -20,7 +23,10 @@ def run(hostname, list_of_NS):
     # If no error was thrown check if nameserver records are consistent with delegation
     return recordcheck(records, list_of_NS, description)
 
+# Takes "records" list of lists of string, "list_of_NS" list of string, "description" string
+# Returns dictionary with "description" key string value, "results" key boolean value, "details" key string value
 def recordcheck(records, list_of_NS, description):
+    
     # Checking if all nameservers from all queries match the input list of nameservers
     if not all(x == sorted(list_of_NS) for x in records):
         return {"description": description, "result": False, "details": "Delegation is not consistent with nameserver records"}

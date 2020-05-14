@@ -8,10 +8,13 @@ import socket
 import dns.resolver
 from src.helpers import consistent
 
-
+# Takes "hostname" string, "list_of_NS" list of string
+# Returns dictionary with "description" key string value, "results" key boolean value, "details" key string value
 def run(hostname, list_of_NS):
     # Filter out duplicate nameserver entries
     list_of_NS = set(list_of_NS)
+    
+    # Define description of check
     description = "Consistency between authoritative nameservers"
 
     # Get a list of records from all nameservers
@@ -47,6 +50,8 @@ def run(hostname, list_of_NS):
         return {"description": description, "result": True, "details": "Both SOA and NS records are consistent"}
 
 
+# Takes "records" list of lists of string, "list_of_NS" list of string, "flag" string
+# Returns tuple with boolean and string
 def recordcheck(records, list_of_NS, flag):
     
     if not all(records[0] == i for i in records):
