@@ -87,7 +87,7 @@ def test_servers(body):  # noqa: E501
             return  ({"errorDesc": "reCaptcha verification failed"}, 400)
           
     if delegation == True:
-        name_servers = get_nameservers(domain)
+        name_servers = helpers.get_nameservers(domain)
         if name_servers is None:
             return ({"errorDesc": "This domain has no delegated nameservers."}, 400)
 
@@ -155,18 +155,3 @@ def verify_captcha(response):
     else:
         return (False, json_obj["error-codes"])
 
-def get_nameservers(domain):
-
-    results = []
-
-    try:
-        nameservers = dns.resolver.Resolver().query(domain, "NS")
-
-    except Exception as e:
-        print(e)
-        return None
-
-    for i in nameservers.response.answer[0]:
-        results.append(i.to_text())
-    return results
-  

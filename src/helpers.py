@@ -53,3 +53,19 @@ def return_results(domain,name_servers,result_list,ipv6 ):
     additional_checks(domain,name_servers,result_list,ipv6)
 
     return ({"domain": domain, "ns": name_servers, "checks": result_list}, 200)
+
+
+def get_nameservers(domain):
+
+    results = []
+
+    try:
+        nameservers = dns.resolver.Resolver().query(domain, "NS")
+
+    except Exception as e:
+        print(e)
+        return None
+
+    for i in nameservers.response.answer[0]:
+        results.append(i.to_text())
+    return results
