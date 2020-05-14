@@ -26,6 +26,16 @@ domain = args.domain
 ns = args.ns
 ipv6 = args.ipv6=='true'
 
+# Check if any of the input values are empty
+if domain == None or domain == "":
+    raise Exception("ERROR: No domain given")
+
+if ns == None or ns == "":
+    raise Exception("ERROR: No nameservers given")
+
+if ipv6 == None or ipv6 == "":
+    raise Exception("ERROR: No IP version given")
+
 # Now, we can start to run the checks. We define a list to which we append the results from each check.
 results = helpers.return_results(domain,ns,[],ipv6)
 
