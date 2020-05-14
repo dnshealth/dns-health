@@ -60,7 +60,7 @@ def test_servers(body):  # noqa: E501
         if connexion.request.headers.getlist("X-Forwarded-For"):
             ip = connexion.request.headers.getlist("X-Forwarded-For")[0]
         else:
-            ip = connexion.request.origin
+            ip = connexion.request.remote_addr
         if ip in list1:
             whitelisted = True
             
