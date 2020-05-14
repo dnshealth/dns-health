@@ -10,9 +10,9 @@ import src.checks.check_helpers as helpers
 def DESCRIPTION():
     return "Network diversity"
 
-
-def run(hostname, list_of_NS,ipv6):
-
+# Takes "hostname" string, "list_of_NS" list of string
+# Returns dictionary with "description" key string value, "results" key boolean value, "details" key string value
+def run(hostname, list_of_NS, ipv6):
     listASN = []
 
     try: 

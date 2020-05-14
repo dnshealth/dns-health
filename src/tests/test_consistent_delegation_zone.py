@@ -14,3 +14,18 @@ class Test(TestCase):
         # from those on ns1.google.com. This shall FAIL the check (hence the not-word in assert)
         res = run("google.com", ["ns1.google.com", "dns1.dnshealth.eu"])
         assert not res["result"]
+        
+    def test_run_3(self):
+        # This should fail as the delegation is not the full list of records in the nameservers
+        res = run("google.com", ["ns1.google.com", "ns2.google.com"])
+        assert not res["result"]
+        
+    def test_run_4(self):
+        # This should fail as the nameserver IP will not be resolved
+        res = run("kth.se", ["n.n.n"])
+        assert not res["result"]
+        
+    def test_run_5(self):
+        # This should fail as the IP instead of the domain name is given for one of the nameservers
+        res = run("google.com", ["216.239.32.10", "ns2.google.com", "ns3.google.com", "ns4.google.com"])
+        assert not res["result"]
