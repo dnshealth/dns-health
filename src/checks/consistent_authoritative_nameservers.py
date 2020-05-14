@@ -4,21 +4,20 @@
 # Returns False if query fails or nameserver IP can not be resolved
 # Returns False if NS records or SOA records are not consistent
 # Returns True if NS records and SOA records are consistent; contain the same information
-import socket
 import dns.resolver
-from src.helpers import consistent
+from src.checks.check_helpers import consistent
+
+def DESCRIPTION():
+    return "Consistency between authoritative nameservers"
 
 # Takes "hostname" string, "list_of_NS" list of string
 # Returns dictionary with "description" key string value, "results" key boolean value, "details" key string value
-def run(hostname, list_of_NS):
+def run(hostname, list_of_NS, ipv6):
     # Filter out duplicate nameserver entries
     list_of_NS = set(list_of_NS)
-    
-    # Define description of check
-    description = "Consistency between authoritative nameservers"
 
     # Get a list of records from all nameservers
-    ns_check = consistent(hostname, list_of_NS, description, 'NS')
+    ns_check = consistent(hostname, list_of_NS, DESCRIPTION(), 'NS', ipv6)
     
     # Check if record extraction function returned an error, if so return the error
     if not isinstance(ns_check, list):
@@ -29,12 +28,12 @@ def run(hostname, list_of_NS):
     
     # Extract answer from tuple
     if not ns_res[0]:
-        return {"description": description, "result": False, "details": ns_res[1]}
+        return {"description": DESCRIPTION(), "result": False, "details": ns_res[1]}
     else:
         pass
 
     # Get a list of SOA records from all nameservers
-    soa_check = consistent(hostname, list_of_NS, description, 'SOA')
+    soa_check = consistent(hostname, list_of_NS, DESCRIPTION(), 'SOA', ipv6)
     
     # Check if record extraction function returned an error, if so return the error
     if not isinstance(soa_check, list):
@@ -45,9 +44,9 @@ def run(hostname, list_of_NS):
     
     # Extract answer from tuple
     if not soa_res[0]:
-        return {"description": description, "result": False, "details": soa_res[1]}
+        return {"description": DESCRIPTION(), "result": False, "details": soa_res[1]}
     else:
-        return {"description": description, "result": True, "details": "Both SOA and NS records are consistent"}
+        return {"description": DESCRIPTION(), "result": True, "details": "Both SOA and NS records are consistent"}
 
 
 # Takes "records" list of lists of string, "list_of_NS" list of string, "flag" string

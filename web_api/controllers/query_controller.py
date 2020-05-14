@@ -51,6 +51,7 @@ def test_servers(body):  # noqa: E501
     token = body.token
     captcha = body.recaptcha_response
     delegation = body.delegation
+    ipv6 = body.ipv6
     
     # Get whitelisted IPs from environmental variables...
     whitelisted = False
@@ -98,7 +99,7 @@ def test_servers(body):  # noqa: E501
     if domain == "" or domain == None or name_servers == [] or name_servers == None or name_servers == [None]:
         return ({"errorDesc": "One of the fields is empty!"}, 400)
       
-    return helpers.return_results(domain,name_servers,[])
+    return helpers.return_results(domain,name_servers,[], ipv6)
 
 # Check if token given by client is valid
 def check_token(token):

@@ -11,19 +11,19 @@
 import dns.resolver
 import ipaddress
 
+def DESCRIPTION():
+    return "Prohibited Networks"
 
-def run(domain, ns_list):
-    description = "Prohibited Networks"
+def run(domain, ns_list,ipv6):
 
     # Check each ns in ns_list. If one fails, immediately return false. Otherwise, return true after having checked
     # everything
     for ns in ns_list:
         dictionary = prohibited_check(ns)
         if not dictionary.get("result"):
-            return {"description": description, "result": False, "details": dictionary.get("details")}
+            return {"description": DESCRIPTION(), "result": False, "details": dictionary.get("details")}
 
-    return {"description": description, "result": True, "details": dictionary.get("details")}
-
+    return {"description": DESCRIPTION(), "result": True, "details": dictionary.get("details")}
 
 def prohibited_check(ns_server):
     # Excluding special IP - ranges that are not covered in ipaddress module
