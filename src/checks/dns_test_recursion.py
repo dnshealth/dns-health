@@ -16,7 +16,9 @@ def check_recursive(q, ns_list,ipv6):
             
             query = dns.message.make_query(q, dns.rdatatype.NS)
         
-            y = helpers.getTheIPofAServer(x,ipv6,DESCRIPTION())
+            y = helpers.getTheIPofAServer(x,ipv6,DESCRIPTION())["result"]
+            if not y:
+                return helpers.getTheIPofAServer(x,ipv6,DESCRIPTION())
             
             response = dns.query.udp(query, y)
             

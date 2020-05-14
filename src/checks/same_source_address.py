@@ -23,6 +23,8 @@ def run(hostname, list_of_NS,ipv6):
         try:
             
             nsIP = helpers.getTheIPofAServer(ns,ipv6,DESCRIPTION())["result"]
+            if not nsIP:
+                return helpers.getTheIPofAServer(ns,ipv6,DESCRIPTION())
             
             
             
