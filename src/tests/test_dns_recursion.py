@@ -2,6 +2,7 @@ from unittest import TestCase
 from src.checks.dns_test_recursion import run
 
 class Test(TestCase):
+    #ipv4
     def test_run(self):
         # Here we check no recursion detection results in true
         res = run("google.se", ["ns1.google.se", "ns2.google.se", "ns3.google.se"], False)
