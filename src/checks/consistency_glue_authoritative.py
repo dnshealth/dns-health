@@ -5,7 +5,7 @@ import dns, dns.resolver, dns.query, dns.name
 from dns.exception import DNSException
 #import src.checks.check_helpers as helpers
 
-import check_helpers as helpers
+import src.checks.check_helpers as helpers
 
 def DESCRIPTION():
     return "Check glue consistency"
