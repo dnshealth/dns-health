@@ -27,12 +27,13 @@ def run(domain, ns_list,ipv6):
 
 def prohibited_check(ns_server, ipv6):
     if ipv6:
+        
         try:
+            
             result = dns.resolver.query(ns_server, 'AAAA')
         except:
-            return False
-
-        
+            return {"result": False,
+                    "details": "The NS could not be queried with ipv6"}
         for ipval in result:
             if ipaddress.ip_address(str(ipval)).is_private:
                 return {"result": False,
@@ -65,9 +66,11 @@ def prohibited_check(ns_server, ipv6):
         deprecated_ips = ipaddress.ip_network('192.88.99.0/24')
         shared_address_space = ipaddress.ip_network('100.64.0.0/10')
         try:
+            
             result = dns.resolver.query(ns_server, 'A')
         except:
-            return False
+            return {"result": False,
+                    "details": "The NS could not be queried with ipv4"}
         # for ipval in result:
         #     if (
         #             ipaddress.ip_address(str(ipval)).is_private or
