@@ -33,7 +33,7 @@ def prohibited_check(ns_server, ipv6):
             result = dns.resolver.query(ns_server, 'AAAA')
         except:
             return {"result": False,
-                    "details": "The NS could not be queried with ipv6"}
+                    "details": "{0} could not be queried with ipv6".format(ns_server)}
         for ipval in result:
             if ipaddress.ip_address(str(ipval)).is_private:
                 return {"result": False,
