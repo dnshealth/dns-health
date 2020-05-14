@@ -28,7 +28,7 @@ domain = args.domain
 ns = args.ns
 ipv6 = args.ipv6
 
-if not args.delegated:
+if args.delegated:
     ns = helpers.get_nameservers(domain)
 
 # Check if any of the input values are empty
