@@ -3,59 +3,35 @@
 #DNSHEALTH-12
 import dns.resolver
 from dns.exception import DNSException
+import src.checks.check_helpers as helpers
 
-def getTheIPofAServer(nameOfTheServer):
-   
-    try:
+def DESCRIPTION():
+    return "Checking for authoritative answers"
 
-        temp  = dns.resolver.Resolver().query(nameOfTheServer,'A')
-
-    except Exception as e:
-
-        return {"result": False, "description": "Checking for authoritative answers" ,"details": e.msg}
-
-    answer = temp.response.answer[0][0].to_text()
-
-    if answer is not None:
-        return {"result": answer, "description": "Checking for authoritative answers", "details": "Successfully found the IP!"}
-    else:
-        return {"result": False, "description": "Checking for authoritative answers" ,"details": "No A records for {0} server were found!".format(nameOfTheServer)}
-
-def getAuthServers(domain, name_servers):
+def answer_authoritatively(domain, name_servers,ipv6):
 
     for server in name_servers:
+        
+        ip = helpers.getTheIPofAServer(server,ipv6,DESCRIPTION())
 
-        response = None
-
-        try:
-
-            ip = getTheIPofAServer(server)
-            
-        except Exception as e:
-                
-            return {"result": False, "description" : "Checking for authoritative answers" ,"details": e.msg }
-
-        if ip["result"] == False :
-            
+        if ip["result"] == False:
             return ip
 
         try:
 
             var = dns.message.make_query(domain,dns.rdatatype.SOA)
 
-            response = dns.query.udp(var, getTheIPofAServer(server)["result"])
+            response = dns.query.udp(var, ip["result"])
+            
         
         except DNSException as e:
             
-            return {"result": -1,"description" : "Checking for authoritative answers", "details": e.msg}
+            return {"result": False,"description" : DESCRIPTION(), "details": e.msg}
 
-        answer   = response.answer
+        if len(response.answer) == 0:
+            return {"result": False ,"description": DESCRIPTION(), "details": "Resolved 0 authoritative servers"}
 
-        if len(answer) == 0:
-            return {"result": False ,"description": "Checking for authoritative answers", "details": "Resolved 0 authoritative servers"}
+    return {"result": True,"description": DESCRIPTION() ,"details": "Successfully validated authoritative answers"}
 
-    return {"result": True,"description": "Checking for authoritative answers" ,"details": "Successfully validated authoritative answers"}
-
-
-def run(domain, list_of_name_servers):
-    return getAuthServers(domain,list_of_name_servers)
+def run(domain, list_of_name_servers,ipv6):
+    return answer_authoritatively(domain,list_of_name_servers,ipv6)

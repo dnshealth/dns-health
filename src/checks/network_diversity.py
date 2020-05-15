@@ -5,28 +5,33 @@
 # Returns True id all ASN of nameservers are unique
 from ipwhois.net import Net
 from ipwhois.asn import IPASN
-import socket
+import src.checks.check_helpers as helpers
 
+def DESCRIPTION():
+    return "Network diversity"
 
-
-def run(hostname, list_of_NS):
-    description = "Network diversity"
+# Takes "hostname" string, "list_of_NS" list of string
+# Returns dictionary with "description" key string value, "results" key boolean value, "details" key string value
+def run(hostname, list_of_NS, ipv6):
     listASN = []
 
-    try:
+    try: 
         for x in list_of_NS:
+            ip_address = helpers.getTheIPofAServer(x,ipv6,DESCRIPTION())["result"]
+            if isinstance(helpers.getTheIPofAServer(x,ipv6,DESCRIPTION())["result"], bool):
+                return helpers.getTheIPofAServer(x,ipv6,DESCRIPTION())
             # Getting IPs of nameservers
-            net = Net(socket.gethostbyname(x))
+            net = Net(ip_address)
             obj = IPASN(net)
             # Getting dictionary with AS info for specific IP
             results = obj.lookup()
             # Extracts only ASN from dictionary and adds them to a list
             listASN.append(results.get('asn'))
-    except socket.gaierror as err:
-        return {"description": description, "result": False, "details": str(err) + f": could not resolve IP of nameserver {x}"}
+    except Exception as err:
+        return {"description": DESCRIPTION(), "result": False, "details": str(err) + f": could not resolve IP of nameserver {x}"}
 
     # Checks if nameservers ar located in at least 2 different Autonomous Systems
     if  len(set(listASN)) < 2:
-        return {"description": description, "result": False, "details": "all nameservers are located in the same Autonomous System"}
+        return {"description": DESCRIPTION(), "result": False, "details": "all nameservers are located in the same Autonomous System"}
     else:
-        return {"description": description, "result": True, "details": f"nameserver are located at {len(set(listASN))} different Autonumous Systems"}
+        return {"description": DESCRIPTION(), "result": True, "details": f"nameserver are located at {len(set(listASN))} different Autonumous Systems"}

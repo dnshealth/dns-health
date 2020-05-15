@@ -69,13 +69,23 @@
         <div class="row">
             <div class="centerlist">
                 <ul>
-                    <li>Technical Testing Environment</li>
-                    <li>HTTP REST API</li>
-                    <li>A Web Interface</li>
+                    <li>&#10004; Technical Testing Environment</li>
+                    <li>&#10004; DNS checker checks</li>
+                    <li>&#10004; HTTP REST API</li>
+                    <li>&#10004; A Web Interface</li>
+                    <li>&#10004; Project Page</li>
+                    <li>&#10004; Writing tests for DNS checker</li>
+                    <li>&#10004; CAPTCHA on the main page</li>
+                    <li>&#10004; IP whitelisting</li>
+                    <li>&#10004; Make all checks return a more detailed error</li>
+                    <li>&#10004; Add prerequisites for checks</li>
                     <li>DNSSEC/DS Record Checks</li>
-                    <li>Delegated Domain Support</li>
-                    <li>Further DNS Checks</li>
-                    <li>Mail Server Health Checker</li>
+                    <li>&#10004; Delegated Domain Support</li>
+                    <li>Add possibility to separately enable/disable IPv6</li>
+                    <li>&#10004; Some kind of easter egg</li>
+                    <li><s>A dig web interface</s></li>
+                    <li><s>Further DNS Checks</s></li>
+                    <li><s>Mail Server Health Checker</s></li>
                 </ul>
             </div>
         </div>
@@ -209,7 +219,7 @@
         <!-- About Section Content-->
         <div class="row">
             <div><p class="lead">DNSHealth is a tool designed to verify the compliance of a DNS server and a DNS zone
-                contained within in to the specifications specified in the <a style="color:white"
+                contained within in to the specifications specified in the <a style="color:white; text-decoration: underline;"
                                                                               href="https://www.iana.org/help/nameserver-requirements">IANA
                     nameserver technical standard</a>. The tool will check if the zone for a domain name has been
                 correctly set up at the specified nameservers. Based on this information, the user can determine if a
@@ -296,9 +306,10 @@
                             <!-- Portfolio Modal - Text-->
                             <p class="mb-5">
                             <ul>
-                                <li>Landing page for the project</li>
-                                <li>A backend for the DNS Checker</li>
+                                <li>Project page</li>
+                                <li>DNS checker checks</li>
                                 <li>Technical testing environment</li>
+                                <li>Writing tests for DNS checker</li>
                             </ul>
                             </p>
 
@@ -337,9 +348,8 @@
                             <!-- Portfolio Modal - Text-->
                             <p class="mb-5">
                             <ul>
-                                <li>Coming soon...</li>
-                                <li>Coming soon...</li>
-                                <li>Coming soon...</li>
+                                <li>HTTP REST API</li>
+                                <li>A web interface</li>
                             </ul>
                             </p>
 
@@ -378,9 +388,12 @@
                             <!-- Portfolio Modal - Text-->
                             <p class="mb-5">
                             <ul>
-                                <li>Coming soon...</li>
-                                <li>Coming soon...</li>
-                                <li>Coming soon...</li>
+                                <li>Make all checks return a more detailed error</li>
+                                <li>IP whitelisting</li>
+                                <li>CAPTCHA on the main page</li>
+                                <li>Add prerequisites for checks</li>
+                                <li>Delegated domain support</li>
+                                <li>DNSSEC / DS record checks</li>
                             </ul>
                             </p>
                             <button class="btn btn-primary" href="#" data-dismiss="modal"><i
@@ -418,9 +431,14 @@
                             <!-- Portfolio Modal - Text-->
                             <p class="mb-5">
                             <ul>
-                                <li>Coming soon...</li>
-                                <li>Coming soon...</li>
-                                <li>Coming soon...</li>
+                                <li>DNSSEC / DS record checks</li>
+                                <li>Add possibility to separately enable/disable IPv6</li> 
+                                <li>Add tests to backend and frontend</li>
+                                <li>Add more detailed technical information on the FAQ page</li>
+                                <li>Bug fixing (frontend & backend)</li>
+                                <li>Improve UX</li>
+                                <li>Code refactoring and commenting</li>
+                                <li>Make a plan for the expo day</li>
                             </ul>
                             </p>
                             <button class="btn btn-primary" href="#" data-dismiss="modal"><i
@@ -457,14 +475,12 @@
                                 <div class="divider-custom-line"></div>
                             </div>
                             <!-- Portfolio Modal - Image--><img class="img-fluid rounded mb-5"
-                                                                src="assets/img/portfolio/cabin.png" alt=""/>
+                                                                src="screenshots/dnshealth-eu-3.png" alt=""/>
                             <!-- Portfolio Modal - Text-->
 
                             <p class="mb-5">
                             <ul>
-                                <li>Coming soon...</li>
-                                <li>Coming soon...</li>
-                                <li>Coming soon...</li>
+                                <li><b>How to demo</b>: Run ./main.py --domain kth.se --ns a.ns.kth.se b.ns.kth.se</li>
                             </ul>
                             </p>
 
@@ -500,13 +516,13 @@
                                 <div class="divider-custom-line"></div>
                             </div>
                             <!-- Portfolio Modal - Image--><img class="img-fluid rounded mb-5"
-                                                                src="assets/img/portfolio/cake.png" alt=""/>
+                                                                src="screenshots/dnshealth-eu-1.png" alt=""/>
+                            <img class="img-fluid rounded mb-5"
+                                                                src="screenshots/dnshealth-eu-2.png" alt=""/>
                             <!-- Portfolio Modal - Text-->
                             <p class="mb-5">
                             <ul>
-                                <li>Coming soon...</li>
-                                <li>Coming soon...</li>
-                                <li>Coming soon...</li>
+                                <li><b>How to demo</b>: Visit dnshealth.eu and try out the terminal view (and without it :) )</li>
                             </ul>
                             </p>
 
@@ -542,13 +558,12 @@
                                 <div class="divider-custom-line"></div>
                             </div>
                             <!-- Portfolio Modal - Image--><img class="img-fluid rounded mb-5"
-                                                                src="assets/img/portfolio/circus.png" alt=""/>
+                                                                src="screenshots/dnshealth-eu-4.png" alt=""/>
+                            <img class="img-fluid rounded mb-5" src="screenshots/dnshealth-eu-5.png" alt=""/>
                             <!-- Portfolio Modal - Text-->
                             <p class="mb-5">
                             <ul>
-                                <li>Coming soon...</li>
-                                <li>Coming soon...</li>
-                                <li>Coming soon...</li>
+                                <li><b>How to demo</b>: Show the captcha, delegated domain feature, the more detailed error modal window, extended FAQ page and easter eggs.</li>
                             </ul>
                             </p>
                             <button class="btn btn-primary" href="#" data-dismiss="modal"><i
