@@ -14,16 +14,20 @@ import socket
 
 
 def get_keys(domain, nameserver):
+
   response = query_servers(domain, nameserver, dns.rdatatype.DNSKEY)
   
   if not response:
-    return (None, None, None);
+    return (None, None, None, None);
 
-  (RRset, key) = get_DNSKEY_RRset(response.answer)
+  (RRset, KSK, ZSK) = get_DNSKEY_RRset(response.answer)
   RRsig = get_RRsig(response.answer)
 
-  return(RRset, key, RRsig)
+  return(RRset, KSK, ZSK, RRsig)
   
+
+
+
 def get_SOA_keys(domain, nameserver):
   response = query_servers(domain, nameserver, dns.rdatatype.SOA)
   
@@ -45,9 +49,11 @@ def get_SOA_keys(domain, nameserver):
 
 def top_level_domains(domain,root_servers, root_dslist):
   for server in root_servers:
-    validation = validate_root(server, root_dslist)
+    (validation, RRset) = validate_root(server, root_dslist)
     if validation.get('result'):
-      return next_in_recurssion(domain, server)
+      domain = prepare_domain(domain)
+      domain = domain[0] + '.'
+      return next_in_recurssion('.', domain, server, RRset)
 
 
 
@@ -58,20 +64,20 @@ def top_level_domains(domain,root_servers, root_dslist):
 
 def get_DS(section):
  
-  child_ds = []
+  child_ds = None
   child_algo = None
   
   for record in section:
     if (record.rdtype == dns.rdatatype.DS):
+      child_ds = record
       for DS in record:
-        child_ds.append(DS)
         if (DS.digest_type == 1):
           child_algo = ('sha1')
         elif (DS.digest_type == 2):
           child_algo = ('sha256')
       
   
-  return (child_ds, child_algo)
+  return (child_ds, child_algo, get_RRsig(section))
 
 
 def get_A_RRset(section):
@@ -85,17 +91,20 @@ def get_A_RRset(section):
 
 
 def get_DNSKEY_RRset(section):
-  records = []
+  ZSK = []
+  KSK = []
   RRset = None
   for sets in section:
     if sets.rdtype == dns.rdatatype.DNSKEY:
       for dnskey in sets:
+        RRset = sets
         if dnskey.flags == 257:
-          RRset = sets
-          records.append(dnskey)
+          KSK.append(dnskey)
+        if dnskey.flags == 256:
+          ZSK.append(dnskey)
           
   
-  return (RRset , records)
+  return (RRset , KSK, ZSK)
 
 
 def get_SOA_RRset(section):
@@ -132,8 +141,10 @@ def check_additional_section(section):
 
 def check_authority_NS(section):
   list_of_NS = []
-  for NS in section[0]:
-    list_of_NS.append(NS.to_text())
+  for RRset in section:
+    if RRset.rdtype == dns.rdatatype.NS:
+      for NS in RRset:
+        list_of_NS.append(NS.to_text())
 
   return list_of_NS
 
@@ -150,11 +161,8 @@ def query_servers(domain, server, type):
   )
   try:
     response = dns.query.tcp(request, server, 1)
-    print(response)
-    print()   
   except:
     return False
-
   
   return response
 
@@ -170,63 +178,77 @@ def hash_key(domain, key, algorithm):
 
 
 
-def two_step_validate(domain, hashed_key, dslist, RRsig, RRset):
+
+def RRset_val(RRset, RRsig, keys, domain):
+  try:
+    dns.dnssec.validate(RRset, RRsig, {dns.name.from_text(domain):keys})
+  except dns.dnssec.ValidationFailure:
+    return {"result":False, "details":"RRSIG validation failed"}
+  
+  return {"result": True, "details": "Validation succeeded"}
+
+
+
+
+
+
+
+def hash_match(list_of_ds, hashed_key):
   hashtest = False
   
-  for ds in dslist:
+  for ds in list_of_ds:
     if ds == hashed_key:
       hashtest = True
       break
-
-  
-  
   
   
   if not hashtest:
     return {"result":False, "details":"Hashed DNSKEY does not match parent DS record hash"}
 
-  print(ds)
-  print(hashed_key)
-  print()
-  
-  try:
-    dns.dnssec.validate(RRset, RRsig, {dns.name.from_text(domain):RRset})
-  except dns.dnssec.ValidationFailure:
-    return {"result":False, "details":"RRSIG validation failed"}
-  
-  
-  return {"result": True, "details": "Validation succeeded"}
+  return {'result': True, 'details': 'Hashed keys match'}
 
 
-def SOA_check(query, current_level_servers):
+def two_step_validate(domain, hashed_key, dslist, RRsig, RRset, keys):
+  
+  match = hash_match(dslist, hashed_key)
+  if not match.get('result'):
+    return match 
+  
+  return RRset_val(RRset, RRsig, keys ,domain)
+
+
+def SOA_check(query, parent_domain, current_level_servers, RRset ,keys):
   for server in current_level_servers:
-        (RRset, RRsig)  = get_SOA_keys(query, server)
-        query = query.split('.', 1)[1]
-        print("Got SOA records")
-        print(type(RRset))
-        print(type(RRsig))
-        if RRset and RRsig:
-          try:
-            dns.dnssec.validate(RRset, RRsig, {dns.name.from_text(query):RRset})
-            return{'result': True, 'details':"SOA found and signed"}
-          except dns.dnssec.ValidationFailure:
-            continue
+        (RRset_SOA, RRsig)  = get_SOA_keys(query, server)
+         
+        if RRset_SOA and RRsig:
+          return RRset_val(RRset_SOA, RRsig, keys, parent_domain)
+        
   return {'result':False, 'details':'No signed SOA records'}
 
 
 
-def validate(domain, list_of_keys, RRsig, RRset, child_ds, child_algo):
+def validate(domain, list_of_keys, RRsig, RRset, child_ds, child_algo, keys):
+
+  if not list_of_keys or not child_algo or not child_ds:
+    return {'result': False, 'details':'No keys or DS records'}
+
   for key in list_of_keys:
     
     
    
     hashed_key = hash_key(domain, key, child_algo)
    
-    validation = two_step_validate(domain, hashed_key, child_ds, RRsig, RRset)
-    if validation.get('result'):
-      return validation
+    match = hash_match(child_ds, hashed_key)
+    if not match.get('result'):
+      continue
+    
+    res = RRset_val(RRset, RRsig, keys, domain)
 
-  return validation
+    if res.get('result'):
+      return res
+    
+  return {'result': False, 'details': 'No matching DS and hashed DNSKEY records for {0}'.format(domain)}
 
 
 
@@ -234,22 +256,27 @@ def validate(domain, list_of_keys, RRsig, RRset, child_ds, child_algo):
 
 def validate_root(nameserver, root_dslist):
 
-  (RRset, dnskey, RRsig_set) =get_keys('.', nameserver)
+  (RRset, KSK, ZSK, RRsig_set) =get_keys('.', nameserver)
 
 
   #The DS record needs to be cast to string since the root anchors are givens as strings
-  hashed_key = str(dns.dnssec.make_ds('.', dnskey[0], 'sha256'))
+  hashed_key = str(dns.dnssec.make_ds('.', KSK[0], 'sha256'))
 
-  validation_result = two_step_validate('.', hashed_key, root_dslist, RRsig_set, RRset)
-  
-  
-  return validation_result
+  validation_result = two_step_validate('.', hashed_key, root_dslist, RRsig_set, RRset, KSK)
 
-def next_in_recurssion(domain, server):
+  #Validated ZSK
+  return (validation_result, RRset)
+
+
+
+
+
+
+def next_in_recurssion(parent_domain, subdomain, server, keys):
 
  
 
-  response = query_servers(domain, server, dns.rdatatype.DNSKEY)
+  response = query_servers(subdomain, server, dns.rdatatype.DNSKEY)
 
   
   if not response:
@@ -257,23 +284,43 @@ def next_in_recurssion(domain, server):
 
  
 
-  (child_DS, child_algo) = get_DS(response.authority)
+  (child_ds, child_algo, RRsig) = get_DS(response.authority)
+
+  if child_ds and child_algo and RRsig:
+    result = RRset_val(child_ds, RRsig, keys, parent_domain)
+    if not result.get('result'):
+      return {'result':False, 'details':'DS validation failed'}
+   
+  
+
+
+
 
   #if there is answer section or there is soa type in authority field this is our server IP
   if (len(response.answer) > 0 or ((len(response.authority) > 0) and (response.authority[0].rdtype == dns.rdatatype.SOA))):
-    return ([server], child_DS, child_algo)
+    return ([server], child_ds, child_algo)
 
   additional_servers = check_additional_section(response.additional)
   
   if additional_servers:
-    return (additional_servers, child_DS, child_algo)
+    return (additional_servers, child_ds, child_algo)
     
 
   auth_ns = check_authority_NS(response.authority)
+  
+  counter = 0
+
   for ns in auth_ns:
-    auth_ns = dnssec_check(ns, [])
-    if dnssec_check.get('result'):
-      return (dnssec_check.get('address'), child_DS, child_algo)
+    
+
+    if counter == len(auth_ns):
+      break
+    
+  
+    result_of_resolve = dnssec_check(ns, [])
+    if result_of_resolve.get('result'):
+      return (result_of_resolve.get('address'), child_ds, child_algo)
+    
     
   return (None, None, None)
 
@@ -283,10 +330,10 @@ def next_in_recurssion(domain, server):
   return None
 
 
-def get_next_servers(current, query):
+def get_next_servers(parent_domain, subdomain, current, keys):
   for server in current:
     try:
-      (next_servers, child_ds, child_algo) = next_in_recurssion(query, server)
+      (next_servers, child_ds, child_algo) = next_in_recurssion(parent_domain, subdomain, server, keys)
       if(next_servers):
         return (next_servers, child_ds, child_algo)
     except:
@@ -294,6 +341,8 @@ def get_next_servers(current, query):
 
   return [], None, None
   
+
+
 def prepare_domain(domain):
   domain = domain if domain[-1:] != '.' else domain[:-1]
   layers = domain.split(".")
@@ -320,12 +369,6 @@ def run(domain, nameservers):
         "202.12.27.33", 
     ]
 
-  for server in root_servers:
-    try:
-      dnssec_check(domain, server)
-      print("{0} passed".format(server))
-    except AttributeError:
-      print("{0} failed".format(server))
 
 def dnssec_check(domain, nameserver):
 
@@ -357,7 +400,8 @@ def dnssec_check(domain, nameserver):
 
   query = list_of_levels[0] + "."
   
-  
+
+  #Validated DS records
   (current_level_servers, child_ds, child_algo) = top_level_domains(domain, root_servers, root_dslist)
   
   is_SOA = False
@@ -366,35 +410,36 @@ def dnssec_check(domain, nameserver):
   for domain in list_of_levels[1:]:
 
     
+    
     for server in current_level_servers:
-      (name, n1,n2) = socket.gethostbyaddr(server)
-      print("Getting keys for {0} from {1}".format(query, name))
-      (RRset, key, RRsig) = get_keys(query, server)
-      if RRset and key and RRsig:
-        print("Received keys from {0}".format(name))
+       
+      (RRset, KSK, ZSK, RRsig) = get_keys(query, server)
+      if RRset and KSK and ZSK and RRsig:
         break
-
-      
-    
-    if not key:
-      break
       
     
 
-    validation_result = validate(query, key, RRsig, RRset, child_ds, child_algo)
+    if not RRset or not KSK or not ZSK or not RRsig:
+        query = domain + '.' + query
+        continue
+        return {'result': False, 'details':'No keys or signitures for {0} from {1}'.format(query, socket.gethostbyaddr(server)[0])}
+
+    validation_result = validate(query, KSK, RRsig, RRset, child_ds, child_algo, RRset)
+
+
 
     if not validation_result.get("result"):
       return {'result':False, 'details':'{0} level failed with {1}'. format(domain, validation_result.get('details'))}
 
    
-
+    parent_domain = query
     query = domain + '.' + query
 
     if not current_level_servers:
       break
 
-    (next_level_servers, child_ds, child_algo) = get_next_servers(current_level_servers, query)
-
+    (next_level_servers, child_ds, child_algo) = get_next_servers(parent_domain, query, current_level_servers, RRset)
+  
 
     current_level_servers = next_level_servers
 
@@ -405,7 +450,7 @@ def dnssec_check(domain, nameserver):
   
   #Now we do the last part, where we ask the authoritative nameserver for keys
   
-  res = SOA_check(query, current_level_servers)
+  res = SOA_check(query, parent_domain ,current_level_servers, RRset, ZSK)
   if res.get('result'):
     is_SOA = True
   
@@ -414,20 +459,27 @@ def dnssec_check(domain, nameserver):
 
   if not is_SOA:
     for auth_ns in current_level_servers:
-      (RRset, key, RRsig) = get_keys(query, auth_ns)
-      if RRset and key and RRsig:
+      (RRset, KSK, ZSK, RRsig) = get_keys(query, auth_ns)
+      if RRset and KSK and ZSK and RRsig:
         break
     
-  
+        
+    
+    if not RRset or not KSK or not ZSK or not RRsig:
+        return {'result': False, 'details':'No keys or signitures for {0} from {1}'.format(query, socket.gethostbyaddr(server)[0])}
   
 
-    validation_result = validate(query, key, RRsig, RRset, child_ds, child_algo)
+
+    validation_result = validate(query, RRset, RRsig, RRset, child_ds, child_algo,  RRset)
 
   
   
   
     if not validation_result.get("result"):
-      return {'result':False, 'details':'Authoritative level failed with {1}'. format(query, validation_result.get('details'))}
+      return {'result':False, 'details':validation_result.get('details')}
+
+
+
 
   for auth_ns in current_level_servers:
     response = query_servers(query, auth_ns, dns.rdatatype.A)
@@ -439,26 +491,28 @@ def dnssec_check(domain, nameserver):
     return {'result': False}
 
   RRset_A = get_A_RRset(response.answer)
-  RRsig = get_RRsig(response.answer)
+  RRsig_A = get_RRsig(response.answer)
  
 
-  print(RRsig, RRset_A)
+  if is_SOA:
+    query = parent_domain
+   
 
-  try:
-    dns.dnssec.validate(RRset_A, RRsig, {dns.name.from_text(query):RRset})
-    print("PASSED!")
-  except dns.dnssec.ValidationFailure:
-    return {"result":False, "details":"RRSIG validation failed"}
-  
-  
-  return {"result": True, "details": "Validation succeeded", "address":current_level_servers}
+  res = RRset_val(RRset_A, RRsig_A,  RRset, query)
 
+  if res.get('result'):
+    list_of_A = []
+    for A_record in RRset_A:
+      list_of_A.append(A_record.to_text())
+    return {'result': True, 'details': "Securely retrived A record for {0}".format(original_domain), 'address': list_of_A}
+
+  return {'result': False, 'details' : 'Could not verify A record of {0}'.format(original_domain)}
   
 
   
   
 if __name__ == "__main__":
-  dnssec_check("ns-ext.nlnetlabs.nl.", [])
+  print(dnssec_check("dnssec-deployment.org", []))
   #dnssec_check("iana.org.", [])
 
   
