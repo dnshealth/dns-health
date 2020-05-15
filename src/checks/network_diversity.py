@@ -32,6 +32,6 @@ def run(hostname, list_of_NS, ipv6):
 
     # Checks if nameservers ar located in at least 2 different Autonomous Systems
     if  len(set(listASN)) < 2:
-        return {"description": DESCRIPTION(), "result": False, "details": "all nameservers are located in the same Autonomous System"}
+        return {"description": DESCRIPTION(), "result": False, "details": "All nameservers are located in the same Autonomous System"}
     else:
-        return {"description": DESCRIPTION(), "result": True, "details": f"nameserver are located at {len(set(listASN))} different Autonumous Systems"}
+        return {"description": DESCRIPTION(), "result": True, "details": f"Nameserver are located at {len(set(listASN))} different Autonumous Systems"}

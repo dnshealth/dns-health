@@ -32,7 +32,7 @@ def check_recursive(q, ns_list,ipv6):
             pass
 
     
-    return {"result": False, "details": "no recursion"}
+    return {"result": False, "details": "No recursion"}
 
     # It will return a boolean of whether recursion occured
 
