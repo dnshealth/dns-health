@@ -7,6 +7,7 @@ import dns.rdatatype
 import dns.rdataclass
 import re
 import socket
+import check_helpers
 
 
 
@@ -308,18 +309,13 @@ def next_in_recurssion(parent_domain, subdomain, server, keys):
 
   auth_ns = check_authority_NS(response.authority)
   
-  counter = 0
-
+  
   for ns in auth_ns:
     
-
-    if counter == len(auth_ns):
-      break
-    
   
-    result_of_resolve = dnssec_check(ns, [])
+    result_of_resolve = check_helpers.getTheIPofAServer(ns, False, None)
     if result_of_resolve.get('result'):
-      return (result_of_resolve.get('address'), child_ds, child_algo)
+      return ([result_of_resolve.get('result')], child_ds, child_algo)
     
     
   return (None, None, None)
