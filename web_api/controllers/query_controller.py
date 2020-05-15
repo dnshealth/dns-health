@@ -51,7 +51,6 @@ def test_servers(body):  # noqa: E501
     token = body.token
     captcha = body.recaptcha_response
     delegation = body.delegation
-    ipv6 = body.ipv6
     
     # Get whitelisted IPs from environmental variables...
     whitelisted = False
@@ -60,7 +59,7 @@ def test_servers(body):  # noqa: E501
         if connexion.request.headers.getlist("X-Forwarded-For"):
             ip = connexion.request.headers.getlist("X-Forwarded-For")[0]
         else:
-            ip = connexion.request.remote_addr
+            ip = connexion.request.origin
         if ip in list1:
             whitelisted = True
             
@@ -87,7 +86,7 @@ def test_servers(body):  # noqa: E501
             return  ({"errorDesc": "reCaptcha verification failed"}, 400)
           
     if delegation == True:
-        name_servers = helpers.get_nameservers(domain)
+        name_servers = get_nameservers(domain)
         if name_servers is None:
             return ({"errorDesc": "This domain has no delegated nameservers."}, 400)
 
@@ -99,7 +98,7 @@ def test_servers(body):  # noqa: E501
     if domain == "" or domain == None or name_servers == [] or name_servers == None or name_servers == [None]:
         return ({"errorDesc": "One of the fields is empty!"}, 400)
       
-    return helpers.return_results(domain,name_servers,[], ipv6)
+    return helpers.return_results(domain,name_servers,[])
 
 # Check if token given by client is valid
 def check_token(token):
@@ -155,3 +154,18 @@ def verify_captcha(response):
     else:
         return (False, json_obj["error-codes"])
 
+def get_nameservers(domain):
+
+    results = []
+
+    try:
+        nameservers = dns.resolver.Resolver().query(domain, "NS")
+
+    except Exception as e:
+        print(e)
+        return None
+
+    for i in nameservers.response.answer[0]:
+        results.append(i.to_text())
+    return results
+  

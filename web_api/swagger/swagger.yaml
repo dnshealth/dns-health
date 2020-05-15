@@ -73,8 +73,6 @@ components:
           type: string
         delegation:
           type: boolean
-        ipv6:
-          type: boolean
     Token:
       type: object
       properties:

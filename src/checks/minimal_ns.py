@@ -1,11 +1,12 @@
-import src.checks.check_helpers as helpers
+import socket
 
-def DESCRIPTION():
-    return "Unique Nameservers"
+def run(domain, ns):
+    res = unique_ns_list(ns)
+    return {"description": "Unique Nameservers", "result": res.get("result"), "details": res.get("details")}
 
-def unique_ns_list(l,ipv6): # Takes in a list
+def unique_ns_list(l): # Takes in a list
     if test_len(l):    # Tests if the length of the list is greater than 1
-        if unique_ip(l,ipv6): # If that passes it checks for unique ip
+        if unique_ip(l): # If that passes it checks for unique ip
             # print("The servers are more than 1 and unique")
             return {"result": True, "details": "Passed"}
         else:
@@ -18,24 +19,22 @@ def unique_ns_list(l,ipv6): # Takes in a list
 def test_len(l):
     return len(l)>1
 
-def unique_ip(l,ipv6):
+def unique_ip(l):
     try: 
-        y =  helpers.getTheIPofAServer(l[0],ipv6,DESCRIPTION()) # Will return the ip adress of the host adress
+        y = socket.gethostbyname(l[0]) # Will return the ip adress of the host adress
         l2 = l[1:] # creates a list starting from the second element
         for x in l2: # "for each" loop for every element in the second list
             try:
-                if y == helpers.getTheIPofAServer(x,ipv6,DESCRIPTION()):
+                if y == socket.gethostbyname(x):
                     return False # if the comparison ever detects same host ip it will return false
                 elif len(l2)<2:
                     return True # if the second list is ever lesser than 2 then it will return true
             except Exception:
                 pass
-        return unique_ip(l2,ipv6)
+        return unique_ip(l2)
     except Exception:
         return False
  
-def run(domain, ns,ipv6):
-    res = unique_ns_list(ns,ipv6)
-    return {"description": DESCRIPTION(), "result": res.get("result"), "details": res.get("details")}
-
+    
+    
  # uses recursive calls to return the answer
