@@ -15,7 +15,7 @@ class Check(Model):
     Do not edit the class manually.
     """
     
-    def __init__(self, domain: str=None, nameservers: List[str]=None, token: str=None, recaptcha_response: str=None, delegation: bool=None):  # noqa: E501
+    def __init__(self, domain: str=None, nameservers: List[str]=None, token: str=None, recaptcha_response: str=None, delegation: bool=None, ipv6: bool=None):  # noqa: E501
         """Check - a model defined in Swagger
 
         :param domain: The domain of this Check.  # noqa: E501
@@ -32,7 +32,8 @@ class Check(Model):
             'nameservers': List[str],
             'token': str,
             'recaptcha_response': str,
-            'delegation': bool
+            'delegation': bool,
+            'ipv6': bool
 
         }
 
@@ -41,7 +42,8 @@ class Check(Model):
             'nameservers': 'nameservers',
             'token': 'token',
             'recaptcha_response': 'recaptcha_response',
-            'delegation': 'delegation'
+            'delegation': 'delegation',
+            'ipv6': 'ipv6'
         }
         
         self._domain = domain
@@ -49,6 +51,7 @@ class Check(Model):
         self._token = token
         self._recaptcha_response = recaptcha_response
         self._delegation = delegation
+        self._ipv6 = ipv6
 
 
     @classmethod
@@ -172,5 +175,26 @@ class Check(Model):
         """
 
         self._delegation = delegation
+    
+    @property
+    def ipv6(self) -> bool:
+        """Can enable ipv6 of this Check.
+
+
+        :return: The ipv6 of this Check.
+        :rtype: bool
+        """
+        return self._ipv6
+    
+    @ipv6.setter
+    def ipv6(self, ipv6: bool):
+        """Sets the ipv6 of this Check.
+
+
+        :param ipv6: The ipv6 of this Check.
+        :type ipv6: bool
+        """
+
+        self._ipv6 = ipv6
 
 
