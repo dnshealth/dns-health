@@ -1,4 +1,6 @@
 dnspython
+pycryptodome
+ecdsa
 IPy
 ipwhois
 termcolor

@@ -9,7 +9,7 @@ def IMPORTANT_CHECKS():
 def ADDITIONAL_CHECKS():
     return [checks.consistency_glue_authoritative, checks.consistent_delegation_zone,
     checks.consistent_authoritative_nameservers,
-    checks.minimal_ns,checks.network_diversity,checks.truncref]
+    checks.minimal_ns,checks.network_diversity,checks.truncref,checks.dnssec_main]
 
 def get_details(result, id):
     return {"id" : id, "result" : result.get("result"), "description" : result.get("description"), "details" : result.get("details")}
