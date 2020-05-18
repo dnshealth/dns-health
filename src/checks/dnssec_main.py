@@ -1,3 +1,8 @@
+'''
+Written by Kristaps Kalnins <kristapskalnin@gmail.com>
+Finished on 18.05.2020
+Could still use some more refactoring, some edge cases may not work.
+'''
 import dns.name
 import dns.query
 import dns.dnssec
