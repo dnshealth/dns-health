@@ -48,7 +48,7 @@ def nameserver_reachability(domain, name_servers,ipv6):
 
     for i in results:
         if i["description"]["valid_entry"] == "False":
-            return {"result": False, "description":DESCRIPTION() , "details": "server {0} did not return a tcp or a udp packet".format(i["name_server"]), "detailed_results": results}
+            return {"result": False, "description":DESCRIPTION() , "details": "Server {0} did not return a tcp or a udp packet".format(i["name_server"]), "detailed_results": results}
 
     return {"result": True,"description": DESCRIPTION() ,"details": "All the name servers successfully returned a tcp and a udp packet!", "detailed_results": results}
 
