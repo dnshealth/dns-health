@@ -48,7 +48,7 @@ def run(hostname, list_of_NS, ipv6):
     
     # Check if all nameservers, have correct number of parts
     for x in list_of_NS:
-        if len(x.split(".")) < 3:
+        if len(x.split(".")) < 2:
             return {"description": description, "result": False, "details": "Nameserver(s) incorrect form"}
         
     # Return True if all parts of nameserver are valid 
