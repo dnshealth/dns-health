@@ -79,25 +79,17 @@ def get_DS(section):
   return (child_ds, child_algo, get_RRsig(section))
 
 
-#Parse a response section for A records
-def get_A_RRset(section):
+
+#Parse section for SOA records
+def get_SOA_RRset(section):
   RRset = None
   for sets in section:
-    if sets.rdtype == dns.rdatatype.A:
-          RRset = sets
-          
-  
+    if sets.rdtype == dns.rdatatype.SOA:
+      RRset = sets
+
   return RRset
 
-#Parse a response section for AAAA records
-def get_AAAA_RRset(section):
-  RRset = None
-  for sets in section:
-    if sets.rdtype == dns.rdatatype.AAAA:
-          RRset = sets
-          
-  
-  return RRset
+
 
 
 #Parse response section for DNSKEY records
@@ -522,12 +514,9 @@ def dnssec_check(domain, nameserver, ipv6):
 
 
 
-  #After the last zone verification, ask for the A or AAAA record, if in ipv6 mode
+  #After the last zone verification, ask for the SOA record, if in ipv6 mode
   for auth_ns in nameserver:
-    if not ipv6:
-      response = query_servers(query, auth_ns, dns.rdatatype.A)
-    else:
-      response = query_servers(query, auth_ns, dns.rdatatype.AAAA)
+    response = query_servers(query, auth_ns, dns.rdatatype.SOA)
     if  response != False:
       break
   
@@ -535,31 +524,23 @@ def dnssec_check(domain, nameserver, ipv6):
   if response == False:
     return {'result': False, 'details':'Could not get response from authoritative name server'}
 
-  #Again if ipv6, extract the AAAA record, otherwise, the A record
-  if not ipv6:
-    RRset_A = get_A_RRset(response.answer)
-    
-  else:
-    RRset_A = get_AAAA_RRset(response.answer)
+  RRset_SOA = get_SOA_RRset(response.answer)
  
-  RRsig_A = get_RRsig(response.answer)
+  RRsig_SOA = get_RRsig(response.answer)
   
   
-  #If no A record could be retrieved, the test fails and returns
-  if not RRset_A:
-    return {'result': False, 'details':'No A records for {0}'.format(query)}
-  if not RRsig_A:
-    return {'result': False, 'details':'A records not signed'}
+  #If no SOA record could be retrieved, the test fails and returns
+  if not RRset_SOA:
+    return {'result': False, 'details':'No SOA records for {0}'.format(query)}
+  if not RRsig_SOA:
+    return {'result': False, 'details':'SOA records not signed'}
 
-  #Validate the A record with it's RRsig and DNSKEY records
-  res = RRset_val(RRset_A, RRsig_A,  RRset, query)
+  #Validate the SOA record with it's RRsig and DNSKEY records
+  res = RRset_val(RRset_SOA, RRsig_SOA,  RRset, query)
 
   #If the validation succeeds return a passing result, otherwise fail
   if res.get('result'):
-    list_of_A = []
-    for A_record in RRset_A:
-      list_of_A.append(A_record.to_text())
-    return {'result': True, 'details': "Securely retrived A record for {0}".format(original_domain), 'address': list_of_A}
+    return {'result': True, 'details': "Securely retrived SOA record for {0}".format(original_domain)}
 
-  return {'result': False, 'details' : 'Could not verify A record of {0}'.format(original_domain)}
+  return {'result': False, 'details' : 'Could not verify SOA record of {0}'.format(original_domain)}
   
